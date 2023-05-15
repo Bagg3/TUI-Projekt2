@@ -16,6 +16,8 @@ std::string receivedData;
 int main()
 {
 
+	std::string lort = "Lort";
+
 	std::vector<std::string> data;
 	arduino = new SerialPort(portName);
 	arduino->isConnected();
