@@ -6,6 +6,7 @@
 
 User::User(std::string password)
 {
+    /*
     dbHandler db("../UserDB/");
     if (db.findData("db.txt") == "")
     {
@@ -13,6 +14,7 @@ User::User(std::string password)
     }
     password_ = db.findData("db.txt");
     isLoggedIn_ = false;
+    */
 }
 
 void User::login()
@@ -25,14 +27,23 @@ void User::login()
         std::cout << "Password: ";
         std::cin >> password;
 
-        if (password == password_)
+        /*
+                if (password == password_)
+                {
+                    std::cout << "Login successful" << std::endl;
+                    isLoggedIn_ = true;
+                }
+                else
+                {
+                    std::cout << "Login failed try again" << std::endl;
+                }
+        */
+
+        // Used to bypass the database
+        if (password == "admin")
         {
-            std::cout << "Login successful" << std::endl;
             isLoggedIn_ = true;
-        }
-        else
-        {
-            std::cout << "Login failed try again" << std::endl;
+            return;
         }
     }
 }

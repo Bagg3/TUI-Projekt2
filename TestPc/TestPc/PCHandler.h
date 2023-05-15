@@ -3,12 +3,20 @@
 
 // #pragma once
 #include "User.h"
+#include <Serial.h>
+
+#define DATA_LENGTH 255
+
+const char *portName = "\\\\.\\COM3";
+
+// Declare a global object
+std::string receivedData;
 
 class PCHandler
 {
 public:
     PCHandler(std::string password = "admin");
-    // PCHandler(User* user_);
+    PCHandler(User *admin, SerialPort *arduino);
 
     void showMenu();
     void printData();
@@ -18,6 +26,8 @@ public:
 
 private:
     User user;
+    User *userPtr;
+    SerialPort *arduino;
 };
 
 #endif

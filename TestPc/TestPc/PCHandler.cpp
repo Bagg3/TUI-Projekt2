@@ -1,18 +1,19 @@
 #include "PCHandler.h"
 #include <iostream>
-#include <memory.h>
+#include <vector>
+
+SerialPort *arduino;
 
 PCHandler::PCHandler(std::string password)
 {
     User admin(password);
 }
 
-/*
-PCHandler::PCHandler(User *user_)
+PCHandler::PCHandler(User *admin, SerialPort *arduino)
 {
-    user = user_;
+    userPtr = admin;
+    this->arduino = arduino;
 }
-*/
 
 void PCHandler::showMenu()
 {
@@ -67,38 +68,34 @@ void PCHandler::showMenu()
 
 void PCHandler::printData()
 {
-    std::cout << "Printing data..." << std::endl;
-
     int choice = 0;
     bool goBack = false;
+
+    std::vector<std::string> Log;
 
     while (!goBack)
     {
         clearScreen();
         std::cout << "Please choose an option:" << std::endl;
-        std::cout << "1. Print Newest Data" << std::endl;
-        std::cout << "2. Print Oldest Log" << std::endl;
-        std::cout << "3. Print Nothing" << std::endl;
-        std::cout << "4. Go Back" << std::endl;
+        std::cout << "1. Print Formatet Log" << std::endl;
+        std::cout << "2. Print Raw Data" << std::endl;
+        std::cout << "3. Go Back" << std::endl;
 
         std::cin >> choice;
 
         switch (choice)
         {
         case 1:
-            std::cout << "You chose to print Newest Data." << std::endl;
-            // Code to print data
+            std::cout << "You chose to print the formated log." << std::endl;
+            Log = getLog();
+            printLog(Log);
             break;
-
         case 2:
-            std::cout << "You chose to Print Oldest Log" << std::endl;
-            // Code to make a change to the system
+            std::cout << "You chose to print the raw data" << std::endl;
+            Log = getLog();
+            printRawData(Log);
             break;
         case 3:
-            std::cout << "You chose to Print Nothing." << std::endl;
-            // Code to calibrate the system
-            break;
-        case 4:
             std::cout << "You chose to Go Back." << std::endl;
             goBack = true;
             break;
@@ -120,12 +117,10 @@ void PCHandler::changeSystem() const
     while (!goBack)
     {
         clearScreen();
-        std::cout << "Welcome to your program!" << std::endl;
         std::cout << "Please choose an option:" << std::endl;
-        std::cout << "1. Change Number of slaves" << std::endl;
-        std::cout << "2. Print Oldest Log" << std::endl;
-        std::cout << "3. Print Nothing" << std::endl;
-        std::cout << "4. Go Back" << std::endl;
+        std::cout << "1. Add a new slave" << std::endl;
+        std::cout << "2. Select room connection" << std::endl;
+        std::cout << "3. Go Back" << std::endl;
 
         std::cin >> choice;
 
@@ -141,10 +136,6 @@ void PCHandler::changeSystem() const
             // Code to make a change to the system
             break;
         case 3:
-            std::cout << "You chose to Print Nothing." << std::endl;
-            // Code to calibrate the system
-            break;
-        case 4:
             std::cout << "You chose to Go Back." << std::endl;
             goBack = true;
             break;
@@ -186,6 +177,91 @@ void PCHandler::changeSlaves() const
     }
 }
 
-void printLog()
+std::vector<std::string> getLog()
 {
+    std::vector<std::string> data;
+    arduino = new SerialPort(portName);
+    arduino->isConnected();
+    std::cout << "Is connected: " << arduino->isConnected() << std::endl;
+
+    while (arduino->isConnected())
+    {
+        char receivedChar;
+        int hasRead = arduino->readSerialPort(&receivedChar, 1);
+        if (hasRead)
+        {
+            if (receivedChar != '\n')
+            {
+                receivedData += receivedChar;
+            }
+            else
+            {
+                data.push_back(receivedData);
+                receivedData.clear();
+            }
+        }
+        if (data.size() == 10)
+        {
+            break;
+        }
+    }
+
+    return data;
+}
+
+void printLog(std::vector<std::string> data)
+{
+    for (int j = 0; j < data.size(); j++)
+    {
+
+        data[j].push_back(' ');
+        int rum = 10;
+
+        // Function to convert exempel to int array, split on " "
+        std::string delimiter = " ";
+        size_t pos = 0;
+        std::string token;
+        int i = 0;
+        int arr[10];
+        while ((pos = data[j].find(delimiter)) != std::string::npos)
+        {
+            token = data[j].substr(0, pos);
+            // std::cout << token << std::endl;
+            arr[i] = std::stoi(token);
+            data[j].erase(0, pos + delimiter.length());
+            i++;
+        }
+        // std::cout << arr << std::endl;
+
+        // function to loop through array and find the highest value
+        int highest = 0;
+        for (int i = 0; i < rum; i++)
+        {
+            if (arr[i] > highest)
+            {
+                highest = arr[i];
+            }
+        }
+
+        std::cout << highest << std::endl;
+        int TOTAL[10];
+        TOTAL[j] = highest;
+
+        for (int k = 0; k < rum; k++)
+        {
+            if (arr[k] == highest)
+            {
+                std::cout << "Person " << i << " "
+                          << "Rum " << k + 1 << " er det mest besogte rum" << std::endl;
+            }
+        }
+    }
+}
+
+void printRawData(std::vector<std::string> data)
+{
+    for (int i = 0; i < data.size(); i++)
+    {
+        std::cout << data[i] << std::endl;
+    }
 }

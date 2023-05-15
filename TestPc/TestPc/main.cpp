@@ -2,21 +2,32 @@
 #include <string>
 #include "User.h"
 #include "PCHandler.h"
+
+int main()
+{
+	PCHandler PC("admin");
+	PC.clearScreen();
+	std::cout << "Welcome to the IPRS system" << std::endl;
+	PC.showMenu();
+
+	return 0;
+}
+
+/*
 #include "Serial.h" // Library described above
 #include <vector>
 
 #define DATA_LENGTH 255
 
-const char* portName = "\\\\.\\COM3";
+const char *portName = "\\\\.\\COM3";
 
 // Declare a global object
-SerialPort* arduino;
+SerialPort *arduino;
 std::string receivedData;
+
 
 int main()
 {
-
-	std::string lort = "Lort";
 
 	std::vector<std::string> data;
 	arduino = new SerialPort(portName);
@@ -88,7 +99,7 @@ int main()
 			if (arr[k] == highest)
 			{
 				std::cout << "Person " << i << " "
-					<< "Rum " << k + 1 << " er det mest besogte rum" << std::endl;
+						  << "Rum " << k + 1 << " er det mest besogte rum" << std::endl;
 			}
 		}
 	}
@@ -112,32 +123,23 @@ int main()
 
 	std::cout << Bruger1 << std::endl;
 
-	*/
+
 	return 0;
 }
 
 // else std::cerr << "Error occured reading data" << "\n";
 // Sleep(50);
+*/
 
 /*
-	PCHandler PC("admin");
-	PC.clearScreen();
-	std::cout << "Welcome to the IPRS system" << std::endl;
-	PC.showMenu();
+# include<windows.h>
+HANDLE console = GetStdHandle(STD_INPUT_HANDLE);
+DWORD consoleMode;
+GetConsoleMode(console, &consoleMode);
 
-	return 0;
+//Remove echo from console
+SetConsoleMode(console, consoleMode & ~ENABLE_ECHO_INPUT);
 
-	*/
-
-	/*
-	# include<windows.h>
-	HANDLE console = GetStdHandle(STD_INPUT_HANDLE);
-	DWORD consoleMode;
-	GetConsoleMode(console, &consoleMode);
-
-	//Remove echo from console
-	SetConsoleMode(console, consoleMode & ~ENABLE_ECHO_INPUT);
-
-	// Set console to default
-	SetConsoleMode(console, consoleMode);
-	*/
+// Set console to default
+SetConsoleMode(console, consoleMode);
+*/
