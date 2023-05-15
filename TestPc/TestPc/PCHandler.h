@@ -1,22 +1,20 @@
 #ifndef PCHANDLER_H
 #define PCHANDLER_H
 
-// #pragma once
+#pragma once
 #include "User.h"
-#include <Serial.h>
-
-#define DATA_LENGTH 255
-
-const char *portName = "\\\\.\\COM3";
-
-// Declare a global object
-std::string receivedData;
+#include "Serial.h"
+#include <vector>
 
 class PCHandler
 {
 public:
     PCHandler(std::string password = "admin");
     PCHandler(User *admin, SerialPort *arduino);
+
+    std::vector<std::string> getLog();
+    void printLog(std::vector<std::string> data);
+    void printRawData(std::vector<std::string> data);
 
     void showMenu();
     void printData();

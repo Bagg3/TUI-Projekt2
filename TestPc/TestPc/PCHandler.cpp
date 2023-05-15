@@ -1,8 +1,13 @@
 #include "PCHandler.h"
 #include <iostream>
 #include <vector>
+#include <conio.h>
 
+
+#define DATA_LENGTH 255
+const char* portName = "\\\\.\\COM3";
 SerialPort *arduino;
+std::string receivedData;
 
 PCHandler::PCHandler(std::string password)
 {
@@ -150,7 +155,7 @@ void PCHandler::changeSystem() const
 
 void PCHandler::clearScreen() const
 {
-    system("clear");                         // Code to clear the screen
+    system("cls");                         // Code to clear the screen
     std::cout << "IPRS SYSTEM" << std::endl; // "IPRS SYSTEM
     std::cout << std::endl
               << std::endl;
@@ -177,9 +182,11 @@ void PCHandler::changeSlaves() const
     }
 }
 
-std::vector<std::string> getLog()
+std::vector<std::string> PCHandler::getLog()
 {
     std::vector<std::string> data;
+   
+    /*
     arduino = new SerialPort(portName);
     arduino->isConnected();
     std::cout << "Is connected: " << arduino->isConnected() << std::endl;
@@ -205,11 +212,35 @@ std::vector<std::string> getLog()
             break;
         }
     }
+    */
+
+    std::string string1 = "10 20 40 30 0 0 0 0 0 0";
+    std::string string2 = "20 10 30 20 10 0 0 0 0 0";
+    std::string string3 = "30 0 20 10 10 10 10 0 0 0";
+    std::string string4 = "40 10 20 10 10 0 0 0 0 0";
+    std::string string5 = "0 40 10 20 10 10 0 0 0 0";
+    std::string string6 = "0 0 40 10 20 10 10 0 0 0";
+    std::string string7 = "0 0 0 30 10 30 0 0 0 0";
+    std::string string8 = "0 0 0 0 40 10 20 10 10 0";
+    std::string string9 = "0 0 0 0 0 40 10 20 10 0";
+    std::string string10 = "0 0 0 0 0 0 30 30 10 0";
+
+    data.push_back(string1);
+    data.push_back(string2);
+    data.push_back(string3);
+    data.push_back(string4);
+    data.push_back(string5);
+    data.push_back(string6);
+    data.push_back(string7);
+    data.push_back(string8);
+    data.push_back(string9);
+    data.push_back(string10);
+
 
     return data;
 }
 
-void printLog(std::vector<std::string> data)
+void PCHandler::printLog(std::vector<std::string> data)
 {
     for (int j = 0; j < data.size(); j++)
     {
@@ -256,12 +287,20 @@ void printLog(std::vector<std::string> data)
             }
         }
     }
+    _getch();
 }
 
-void printRawData(std::vector<std::string> data)
+void PCHandler::printRawData(std::vector<std::string> data)
 {
+   
     for (int i = 0; i < data.size(); i++)
     {
         std::cout << data[i] << std::endl;
     }
+
+    std::cout << "Press any key to continue..." << std::endl;
+    std::cout.flush(); // Flush the output stream
+    
+    _getch();
+
 }

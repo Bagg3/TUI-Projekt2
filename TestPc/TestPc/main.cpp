@@ -3,6 +3,12 @@
 #include "User.h"
 #include "PCHandler.h"
 
+/*
+#define DATA_LENGTH 255
+
+const char* portName = "\\\\.\\COM3";
+std::string receivedData;
+*/
 int main()
 {
 	PCHandler PC("admin");
@@ -17,9 +23,7 @@ int main()
 #include "Serial.h" // Library described above
 #include <vector>
 
-#define DATA_LENGTH 255
 
-const char *portName = "\\\\.\\COM3";
 
 // Declare a global object
 SerialPort *arduino;

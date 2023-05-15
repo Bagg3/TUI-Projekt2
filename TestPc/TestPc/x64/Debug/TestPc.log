@@ -1,8 +1,2 @@
-﻿  dbHandler.cpp
-  main.cpp
-  PCHandler.cpp
-  Serial.cpp
-  User.cpp
-  Generating Code...
-  LINK : C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\x64\Debug\TestPc.exe not found or not built by the last incremental link; performing full link
-  TestPc.vcxproj -> C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\x64\Debug\TestPc.exe
+﻿  PCHandler.cpp
+  TestPc.vcxproj -> C:\Users\andre\Documents\GitHub\Tui Program\TUIVSS\TestPc\x64\Debug\TestPc.exe
