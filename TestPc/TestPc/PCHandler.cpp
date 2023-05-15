@@ -3,9 +3,8 @@
 #include <vector>
 #include <conio.h>
 
-
 #define DATA_LENGTH 255
-const char* portName = "\\\\.\\COM3";
+const char *portName = "\\\\.\\COM3";
 SerialPort *arduino;
 std::string receivedData;
 
@@ -22,52 +21,59 @@ PCHandler::PCHandler(User *admin, SerialPort *arduino)
 
 void PCHandler::showMenu()
 {
-    int choice = 0;
-    // bool isLoggedIn = true;
-
-    user.login();
-
-    while (user.isLoggedIn())
+    while (true)
     {
-        clearScreen();
-        std::cout << "Welcome to your program!" << std::endl;
-        std::cout << "Please choose an option:" << std::endl;
-        std::cout << "1. Print Data" << std::endl;
-        std::cout << "2. Make change to system" << std::endl;
-        std::cout << "3. Calibrate system" << std::endl;
-        std::cout << "4. Change Password" << std::endl;
-        std::cout << "5. Log out" << std::endl;
+        int choice = 0;
+        // bool isLoggedIn = true;
 
-        std::cin >> choice;
+        user.login();
 
-        switch (choice)
+        while (user.isLoggedIn())
         {
-        case 1:
-            std::cout << "You chose to print data." << std::endl;
-            printData();
-            break;
-        case 2:
-            std::cout << "You chose to make a change to the system." << std::endl;
-            changeSystem();
-            break;
-        case 3:
-            std::cout << "You chose to calibrate the system." << std::endl;
-            // Code to calibrate the system
-            break;
-        case 4:
-            std::cout << "You chose to change the password." << std::endl;
-            user.changePassword();
-            break;
-        case 5:
-            std::cout << "You chose to log out." << std::endl;
-            user.logout();
-            break;
-        default:
-            std::cout << "Invalid choice. Please choose again." << std::endl;
-            break;
-        }
+            clearScreen();
+            std::cout << "Please choose an option:" << std::endl;
+            std::cout << "1. Print Data" << std::endl;
+            std::cout << "2. Make Change To System" << std::endl;
+            std::cout << "3. Initialise System" << std::endl;
+            std::cout << "4. Change The Log" << std::endl;
+            std::cout << "5. Change Password" << std::endl;
+            std::cout << "6. Log out" << std::endl;
 
-        std::cout << std::endl;
+            std::cin >> choice;
+
+            switch (choice)
+            {
+            case 1:
+                std::cout << "You chose to print data." << std::endl;
+                printData();
+                break;
+            case 2:
+                std::cout << "You chose to make a change to the system." << std::endl;
+                changeSystem();
+                break;
+            case 3:
+                std::cout << "You chose to initialise the system." << std::endl;
+                // Code to calibrate the system
+                break;
+            case 4:
+                // Code to change the log
+                break;
+            case 5:
+                std::cout << "You chose to change the password." << std::endl;
+                user.changePassword();
+                break;
+            case 6:
+                std::cout << "You chose to log out." << std::endl;
+                user.logout();
+                break;
+            default:
+                std::cout << "Invalid choice. Please choose again." << std::endl;
+                break;
+            }
+
+            std::cout << std::endl;
+            clearScreen();
+        }
     }
 }
 
@@ -155,7 +161,7 @@ void PCHandler::changeSystem() const
 
 void PCHandler::clearScreen() const
 {
-    system("cls");                         // Code to clear the screen
+    system("cls");                           // Code to clear the screen
     std::cout << "IPRS SYSTEM" << std::endl; // "IPRS SYSTEM
     std::cout << std::endl
               << std::endl;
@@ -185,7 +191,7 @@ void PCHandler::changeSlaves() const
 std::vector<std::string> PCHandler::getLog()
 {
     std::vector<std::string> data;
-   
+
     /*
     arduino = new SerialPort(portName);
     arduino->isConnected();
@@ -220,7 +226,7 @@ std::vector<std::string> PCHandler::getLog()
     std::string string4 = "40 10 20 10 10 0 0 0 0 0";
     std::string string5 = "0 40 10 20 10 10 0 0 0 0";
     std::string string6 = "0 0 40 10 20 10 10 0 0 0";
-    std::string string7 = "0 0 0 30 10 30 0 0 0 0";
+    std::string string7 = "0 0 0 0 10 30 70 0 0 0";
     std::string string8 = "0 0 0 0 40 10 20 10 10 0";
     std::string string9 = "0 0 0 0 0 40 10 20 10 0";
     std::string string10 = "0 0 0 0 0 0 30 30 10 0";
@@ -235,7 +241,6 @@ std::vector<std::string> PCHandler::getLog()
     data.push_back(string8);
     data.push_back(string9);
     data.push_back(string10);
-
 
     return data;
 }
@@ -274,7 +279,6 @@ void PCHandler::printLog(std::vector<std::string> data)
             }
         }
 
-        std::cout << highest << std::endl;
         int TOTAL[10];
         TOTAL[j] = highest;
 
@@ -287,20 +291,20 @@ void PCHandler::printLog(std::vector<std::string> data)
             }
         }
     }
+    std::cout << std::endl
+              << "Press any key to continue..." << std::endl;
     _getch();
 }
 
 void PCHandler::printRawData(std::vector<std::string> data)
 {
-   
+
     for (int i = 0; i < data.size(); i++)
     {
         std::cout << data[i] << std::endl;
     }
 
-    std::cout << "Press any key to continue..." << std::endl;
-    std::cout.flush(); // Flush the output stream
-    
+    std::cout << std::endl
+              << "Press any key to continue..." << std::endl;
     _getch();
-
 }
