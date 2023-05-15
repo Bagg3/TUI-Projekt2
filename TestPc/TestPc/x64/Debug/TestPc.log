@@ -1,2 +1,8 @@
-﻿  main.cpp
-  TestPc.vcxproj -> C:\Users\andre\coding\cpp\PcProjekt2\VsStudioTest\TestPc\x64\Debug\TestPc.exe
+﻿  dbHandler.cpp
+  main.cpp
+  PCHandler.cpp
+  Serial.cpp
+  User.cpp
+  Generating Code...
+  LINK : C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\x64\Debug\TestPc.exe not found or not built by the last incremental link; performing full link
+  TestPc.vcxproj -> C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\x64\Debug\TestPc.exe
