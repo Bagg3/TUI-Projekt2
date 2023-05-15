@@ -8,19 +8,18 @@
 class SerialPort
 {
 private:
-	HANDLE handler;
-	bool connected;
-	COMSTAT status;
-	DWORD errors;
-
+    HANDLE handler;
+    bool connected;
+    COMSTAT status;
+    DWORD errors;
 
 public:
-	explicit SerialPort(const char* portName);
-	~SerialPort();
+    explicit SerialPort(const char *portName);
+    ~SerialPort();
 
-	int readSerialPort(char* buffer, unsigned int buf_size);
-	bool writeSerialPort(const char* buffer, unsigned int buf_size);
-	bool isConnected();
-	bool isDataAvailable();
-	void closeSerial();
+    int readSerialPort(char *buffer, unsigned int buf_size);
+    bool writeSerialPort(const char *buffer, unsigned int buf_size);
+    bool isConnected();
+    bool isDataAvailable();
+    void closeSerial();
 };

@@ -7,17 +7,17 @@
 class PCHandler
 {
 public:
-	PCHandler(std::string password = "admin");
-	// PCHandler(User* user_);
+    PCHandler(std::string password = "admin");
+    // PCHandler(User* user_);
 
-	void showMenu();
-	void printData();
-	void clearScreen() const;
-	void changeSystem() const;
-	void changeSlaves() const;
+    void showMenu();
+    void printData();
+    void clearScreen() const;
+    void changeSystem() const;
+    void changeSlaves() const;
 
 private:
-	User user;
+    User user;
 };
 
 #endif
