@@ -17,12 +17,20 @@ User::User(std::string password)
     */
 }
 
+void User::clearScreen() const
+{
+    system("cls");                           // Code to clear the screen
+    std::cout << "IPRS SYSTEM" << std::endl; // "IPRS SYSTEM
+    std::cout << std::endl
+              << std::endl;
+}
+
 void User::login()
 {
 
     while (!isLoggedIn())
     {
-        system("cls");
+        clearScreen();
         std::string password;
         std::cout << "Login to the system" << std::endl;
         std::cout << "Password: ";

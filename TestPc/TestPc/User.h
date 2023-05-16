@@ -27,6 +27,9 @@ public:
 
     // Function to change the password of the user, username
     void changePassword();
+
+    // Function to clear the terminal
+    void clearScreen() const;
 };
 
 #endif

@@ -12,14 +12,16 @@ std::string receivedData;
 PCHandler::PCHandler(std::string password)
 {
     User admin(password);
-    rum = 10;
+    amountOfRooms = 10;
+    amountOfUsers = 10;
 }
 
 PCHandler::PCHandler(User *admin, SerialPort *arduino)
 {
     userPtr = admin;
     this->arduino = arduino;
-    rum = 10;
+    amountOfRooms = 10;
+    amountOfUsers = 10;
 }
 
 void PCHandler::showMenu()
@@ -34,6 +36,7 @@ void PCHandler::showMenu()
         while (user.isLoggedIn())
         {
             clearScreen();
+            // Print the menu
             std::cout << "Please choose an option:" << std::endl;
             std::cout << "1. Print Data" << std::endl;
             std::cout << "2. Make Change To System" << std::endl;
@@ -49,30 +52,25 @@ void PCHandler::showMenu()
             switch (choice)
             {
             case 1:
-                std::cout << "You chose to print data." << std::endl;
                 printData();
                 break;
             case 2:
-                std::cout << "You chose to make a change to the system." << std::endl;
                 changeSystem();
                 break;
             case 3:
-                std::cout << "You chose to initialise the system." << std::endl;
                 initialiseSystem();
                 break;
             case 4:
-                // Code to change the log
+                changeLog();
                 break;
             case 5:
-                std::cout << "You chose to change the password." << std::endl;
                 user.changePassword();
+                // userPtr->changePassword();
                 break;
             case 6:
-                std::cout << "You chose to log out." << std::endl;
                 user.logout();
                 break;
-            case 7:
-                std::cout << "You chose to exit." << std::endl;
+            case 7:;
                 running = false;
                 user.logout();
                 break;
@@ -81,6 +79,7 @@ void PCHandler::showMenu()
                 break;
             }
 
+            // Only clears the screen if program is running
             std::cout << std::endl;
             if (running)
                 clearScreen();
@@ -96,6 +95,7 @@ void PCHandler::printData()
     while (!goBack)
     {
         clearScreen();
+        // The various print options
         std::cout << "Please choose an option:" << std::endl;
         std::cout << "1. Print Formatet Log" << std::endl;
         std::cout << "2. Print Raw Data" << std::endl;
@@ -106,15 +106,12 @@ void PCHandler::printData()
         switch (choice)
         {
         case 1:
-            std::cout << "You chose to print the formated log." << std::endl;
             printLog();
             break;
         case 2:
-            std::cout << "You chose to print the raw data" << std::endl;
             printRawData();
             break;
         case 3:
-            std::cout << "You chose to Go Back." << std::endl;
             goBack = true;
             break;
         default:
@@ -135,11 +132,13 @@ void PCHandler::changeSystem()
     while (!goBack)
     {
         clearScreen();
+        // The various change system options
         std::cout << "Please choose an option:" << std::endl;
         std::cout << "1. Add a new slave" << std::endl;
         std::cout << "2. Select room connection" << std::endl;
-        std::cout << "3. Change amounts of room" << std::endl;
-        std::cout << "4. Go Back" << std::endl;
+        std::cout << "3. Change amounts of rooms" << std::endl;
+        std::cout << "4. Change amounts of users" << std::endl;
+        std::cout << "5. Go Back" << std::endl;
 
         std::cin >> choice;
 
@@ -152,9 +151,12 @@ void PCHandler::changeSystem()
             selectRoomConnection();
             break;
         case 3:
-            setRum();
+            setRooms();
             break;
         case 4:
+            setUsers();
+            break;
+        case 5:
             goBack = true;
             break;
         default:
@@ -167,27 +169,22 @@ void PCHandler::changeSystem()
     }
 }
 
-void PCHandler::clearScreen() const
-{
-    system("cls");                           // Code to clear the screen
-    std::cout << "IPRS SYSTEM" << std::endl; // "IPRS SYSTEM
-    std::cout << std::endl
-              << std::endl;
-}
-
 void PCHandler::addSlave()
 {
     clearScreen();
-    bool validChoice = false;
 
+    // Instantiate of variables
+    bool validChoice = false;
     std::string slaveAdress;
     int roomNumber;
 
+    // Makes sure the user inputs a valid binary number
     while (!validChoice)
     {
         std::cout << "Input the slave address (8-bit binary): " << std::endl;
         std::cin >> slaveAdress;
 
+        // Calls the function that checks if the input is a valid binary number
         if (isValidBinary(slaveAdress))
         {
             std::cout << "You chose to change the slave adress to " << slaveAdress << std::endl;
@@ -205,7 +202,7 @@ void PCHandler::addSlave()
         std::cout << std::endl
                   << "Input the room number: " << std::endl;
         std::cin >> roomNumber;
-        if (roomNumber >= 0 && roomNumber <= rum)
+        if (roomNumber >= 0 && roomNumber <= amountOfRooms)
         {
             std::cout << "You chose to change the number of slaves to " << roomNumber << std::endl;
             validChoice = true;
@@ -222,7 +219,6 @@ void PCHandler::addSlave()
     std::string slaveAdresstoSend = "B," + slaveAdress;
 
     std::cout << "Slave adress and room number: " << slaveAdress << std::endl;
-    _getch();
 
     /*
         const char *slaveAdressChar = slaveAdressToSend.c_str();
@@ -231,13 +227,14 @@ void PCHandler::addSlave()
         arduino->writeSerialPort(slaveAdressChar, DATA_LENGTH);
 
         */
+
+    nextMenu();
 }
 
 std::vector<std::string> PCHandler::getLog()
 {
     std::vector<std::string> data;
 
-    /*
     arduino = new SerialPort(portName);
     arduino->isConnected();
     std::cout << "Is connected: " << arduino->isConnected() << std::endl;
@@ -258,12 +255,12 @@ std::vector<std::string> PCHandler::getLog()
                 receivedData.clear();
             }
         }
-        if (data.size() == 10)
+        if (data.size() == amountOfUsers)
         {
+            arduino->closeSerial();
             arduino->~SerialPort();
         }
     }
-    */
 
     std::string string1 = "10 20 40 30 0 0 0 0 0 0";
     std::string string2 = "20 10 30 20 10 0 0 0 0 0";
@@ -293,13 +290,13 @@ std::vector<std::string> PCHandler::getLog()
 void PCHandler::printLog()
 {
     std::vector<std::string> data = getLog();
+    std::vector<int> highestRooms; // Vector to store the highest room numbers
+
     for (int j = 0; j < data.size(); j++)
     {
-
         data[j].push_back(' ');
-        int rum = 10;
 
-        // Function to convert exempel to int array, split on " "
+        // Function to convert example to int array, split on " "
         std::string delimiter = " ";
         size_t pos = 0;
         std::string token;
@@ -308,41 +305,38 @@ void PCHandler::printLog()
         while ((pos = data[j].find(delimiter)) != std::string::npos)
         {
             token = data[j].substr(0, pos);
-            // std::cout << token << std::endl;
             arr[i] = std::stoi(token);
             data[j].erase(0, pos + delimiter.length());
             i++;
         }
-        // std::cout << arr << std::endl;
 
-        // function to loop through array and find the highest value
+        // Find the highest value in the array
         int highest = 0;
-        for (int i = 0; i < rum; i++)
+        int highestRoom = 0;
+        for (int k = 0; k < amountOfRooms; k++)
         {
-            if (arr[i] > highest)
+            if (arr[k] > highest)
             {
-                highest = arr[i];
+                highest = arr[k];
+                highestRoom = k + 1; // Add +1 to get the room number
             }
         }
 
-        int TOTAL[10];
-        TOTAL[j] = highest;
+        // Save the highest room number in the vector
+        highestRooms.push_back(highestRoom);
 
-        for (int k = 0; k < rum; k++)
-        {
-            int l = 1;
-            if (arr[k] == highest)
-            {
-                std::cout << "Person " << l << " "
-                          << "Rum " << k + 1 << " er det mest besogte rum" << std::endl;
-                l++;
-            }
-        }
+        // Print the highest room number for the person
+        std::cout << "Person " << (j + 1) << " is in Room " << highestRoom << std::endl;
     }
 
-    std::cout << std::endl
-              << "Press any key to continue..." << std::endl;
-    _getch();
+    /* Print the highest room numbers
+    for (int i = 0; i < highestRooms.size(); i++)
+    {
+        std::cout << "Person " << (i + 1) << ": Room " << highestRooms[i] << std::endl;
+    }
+    */
+
+    nextMenu();
 }
 
 void PCHandler::printRawData()
@@ -354,15 +348,19 @@ void PCHandler::printRawData()
         std::cout << data[i] << std::endl;
     }
 
-    std::cout << std::endl
-              << "Press any key to continue..." << std::endl;
-    _getch();
+    nextMenu();
 }
 
-void PCHandler::setRum()
+void PCHandler::setRooms()
 {
     std::cout << "Enter the number of rooms: " << std::endl;
-    std::cin >> rum;
+    std::cin >> amountOfRooms;
+}
+
+void PCHandler::setUsers()
+{
+    std::cout << "Enter the number of rooms: " << std::endl;
+    std::cin >> amountOfUsers;
 }
 
 void PCHandler::initialiseSystem() const
@@ -384,9 +382,7 @@ void PCHandler::initialiseSystem() const
         }
 
         */
-
-    std::cout << "System initialised successfully." << std::endl;
-    _getch();
+    _getch(); // Next menu function doesnt work on const function
 }
 
 bool PCHandler::isValidBinary(const std::string &input)
@@ -427,7 +423,7 @@ bool PCHandler::isValidRoom(const std::string &input)
             return false; // The segment is out of the valid range for an integer
         }
 
-        if (roomValue < 1 || roomValue > rum)
+        if (roomValue < 1 || roomValue > amountOfRooms)
             return false; // The room value is outside the valid range
     }
 
@@ -445,9 +441,9 @@ void PCHandler::selectRoomConnection()
     while (!validChoice)
     {
         std::cout << std::endl
-                  << "Input the room number 1 to " << rum << ": " << std::endl;
+                  << "Input the room number 1 to " << amountOfRooms << ": " << std::endl;
         std::cin >> roomNumber;
-        if (roomNumber >= 0 && roomNumber <= rum)
+        if (roomNumber >= 0 && roomNumber <= amountOfRooms)
         {
             std::cout << "Pick the roomnumbers that room is connected to, sepearte by ONLY ',' " << std::endl;
             std::cin >> roomConnections;
@@ -470,5 +466,26 @@ void PCHandler::selectRoomConnection()
         }
     }
 
+    nextMenu();
+}
+
+void PCHandler::changeLog()
+{
+    std::vector<std::string> data = getLog();
+}
+
+void PCHandler::nextMenu()
+{
+    std::cout << std::endl
+              << "Press any key to continue..." << std::endl;
     _getch();
+}
+
+void PCHandler::clearScreen() const
+{
+    // Clears the terminal and prints the title
+    system("cls");                                                      // Code to clear the screen
+    std::cout << "Intelligent Pattern Recognition System" << std::endl; // "IPRS SYSTEM
+    std::cout << std::endl
+              << std::endl;
 }

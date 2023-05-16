@@ -21,14 +21,18 @@ public:
     void printData();
     void changeSystem();
     void addSlave();
-    void setRum();
+    void setRooms();
+    void setUsers();
     void initialiseSystem() const;
     bool isValidBinary(const std::string &input);
     void clearScreen() const;
     bool isValidRoom(const std::string &input);
+    void changeLog();
+    void nextMenu();
 
 private:
-    int rum;
+    int amountOfRooms;
+    int amountOfUsers;
     User user;
     User *userPtr;
     SerialPort *arduino;

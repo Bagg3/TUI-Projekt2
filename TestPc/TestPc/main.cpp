@@ -12,12 +12,20 @@ std::string receivedData;
 
 // const char *portName = "\\\\.\\COM3";
 
+/*
+TODO LIST
+
+- Change the clearScreen function to be with userPtr
+
+*/
+
 int main()
 {
 	// User user("admin");
 	//  SerialPort arduino(portName);
 
-	PCHandler PC("admin");
+	LAV EN FUNKTION SOM HEDDER FORMAT LOG
+		PCHandler PC("admin");
 	PC.clearScreen();
 	PC.showMenu();
 
