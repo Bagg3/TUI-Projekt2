@@ -286,7 +286,7 @@ void PCHandler::printLog(std::vector<std::string> data)
         {
             if (arr[k] == highest)
             {
-                std::cout << "Person " << i << " "
+                std::cout << "Person " << k << " "
                           << "Rum " << k + 1 << " er det mest besogte rum" << std::endl;
             }
         }
