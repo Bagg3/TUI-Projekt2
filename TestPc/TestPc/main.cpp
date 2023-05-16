@@ -6,14 +6,19 @@
 /*
 #define DATA_LENGTH 255
 
-const char* portName = "\\\\.\\COM3";
+
 std::string receivedData;
 */
+
+// const char *portName = "\\\\.\\COM3";
+
 int main()
 {
+	// User user("admin");
+	//  SerialPort arduino(portName);
+
 	PCHandler PC("admin");
 	PC.clearScreen();
-	std::cout << "Welcome to the IPRS system" << std::endl;
 	PC.showMenu();
 
 	return 0;

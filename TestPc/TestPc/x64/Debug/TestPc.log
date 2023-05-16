@@ -1,8 +1,4 @@
-﻿  dbHandler.cpp
-  main.cpp
-  PCHandler.cpp
-  Serial.cpp
-  User.cpp
-  Generating Code...
-  LINK : C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\x64\Debug\TestPc.exe not found or not built by the last incremental link; performing full link
-  TestPc.vcxproj -> C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\x64\Debug\TestPc.exe
+﻿  PCHandler.cpp
+C:\Users\andre\Documents\GitHub\Tui Program\TUIVSS\TestPc\TestPc\PCHandler.cpp(421,45): warning C4101: 'e': unreferenced local variable
+C:\Users\andre\Documents\GitHub\Tui Program\TUIVSS\TestPc\TestPc\PCHandler.cpp(425,41): warning C4101: 'e': unreferenced local variable
+  TestPc.vcxproj -> C:\Users\andre\Documents\GitHub\Tui Program\TUIVSS\TestPc\x64\Debug\TestPc.exe

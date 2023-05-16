@@ -13,16 +13,22 @@ public:
     PCHandler(User *admin, SerialPort *arduino);
 
     std::vector<std::string> getLog();
-    void printLog(std::vector<std::string> data);
-    void printRawData(std::vector<std::string> data);
+    void printLog();
+    void printRawData();
 
+    void selectRoomConnection();
     void showMenu();
     void printData();
+    void changeSystem();
+    void addSlave();
+    void setRum();
+    void initialiseSystem() const;
+    bool isValidBinary(const std::string &input);
     void clearScreen() const;
-    void changeSystem() const;
-    void changeSlaves() const;
+    bool isValidRoom(const std::string &input);
 
 private:
+    int rum;
     User user;
     User *userPtr;
     SerialPort *arduino;

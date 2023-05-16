@@ -22,6 +22,7 @@ void User::login()
 
     while (!isLoggedIn())
     {
+        system("cls");
         std::string password;
         std::cout << "Login to the system" << std::endl;
         std::cout << "Password: ";

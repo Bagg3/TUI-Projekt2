@@ -7,6 +7,14 @@
 #define ARDUINO_WAIT_TIME 2000
 #define MAX_DATA_LENGTH 255
 
+/*
+PROTOCOL TO MASTER
+A = Send log from master
+B = New slave
+C = Room connections
+D = Initialise system
+*/
+
 class SerialPort
 {
 private:
