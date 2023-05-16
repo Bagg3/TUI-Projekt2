@@ -181,11 +181,10 @@ void PCHandler::addSlave()
     // Makes sure the user inputs a valid binary number
     while (!validChoice)
     {
-        std::cout << "Input the slave address (8-bit binary): " << std::endl;
+        std::cout << "Input the slave address in decimals: " << std::endl;
         std::cin >> slaveAdress;
 
-        // Calls the function that checks if the input is a valid binary number
-        if (isValidBinary(slaveAdress))
+        if (slaveAdress >= "1" && slaveAdress <= "255")
         {
             std::cout << "You chose to change the slave adress to " << slaveAdress << std::endl;
             validChoice = true;
@@ -195,6 +194,18 @@ void PCHandler::addSlave()
             std::cout << "Invalid choice. Please choose again." << std::endl;
         }
     }
+
+    /* Calls the function that checks if the input is a valid binary number
+            if (isValidBinary(slaveAdress))
+            {
+                std::cout << "You chose to change the slave adress to " << slaveAdress << std::endl;
+                validChoice = true;
+            }
+            else
+            {
+                std::cout << "Invalid choice. Please choose again." << std::endl;
+            }
+            */
 
     validChoice = false;
     while (!validChoice)
@@ -377,7 +388,6 @@ void PCHandler::initialiseSystem() const
             if (hasWritten)
             {
                 std::cout << "Data written successfully." << std::endl;
-                Sleep(2000);
             }
         }
 

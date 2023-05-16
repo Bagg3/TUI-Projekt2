@@ -19,8 +19,8 @@ User::User(std::string password)
 
 void User::clearScreen() const
 {
-    system("cls");                           // Code to clear the screen
-    std::cout << "IPRS SYSTEM" << std::endl; // "IPRS SYSTEM
+    system("cls");                                                      // Code to clear the screen
+    std::cout << "Intelligent Pattern Recognition System" << std::endl; // "IPRS SYSTEM
     std::cout << std::endl
               << std::endl;
 }

@@ -24,8 +24,10 @@ int main()
 	// User user("admin");
 	//  SerialPort arduino(portName);
 
-	LAV EN FUNKTION SOM HEDDER FORMAT LOG
-		PCHandler PC("admin");
+	/* LAV EN FUNKTION SOM HEDDER FORMATLOG
+		SEND DET TIL TERKEL SOM EN INT*/
+
+	PCHandler PC("admin");
 	PC.clearScreen();
 	PC.showMenu();
 
