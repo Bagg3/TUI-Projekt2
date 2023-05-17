@@ -5,6 +5,7 @@
 
 #define portName "\\\\.\\COM3"
 
+// ÆNDRER I SET USERS SÅ HAN VED HVAD DER BLIVER SENDT
 int main()
 {
 	// Setting up objects and dependcies

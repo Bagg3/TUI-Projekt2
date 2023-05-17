@@ -61,14 +61,13 @@ void PCHandler::showMenu()
                 changeSystem();
                 break;
             case 3:
-                calibrateSystem();
+                initialiseSystem();
                 break;
             case 4:
                 changeLog();
                 break;
             case 5:
-                user.changePassword();
-                // userPtr->changePassword();
+                userPtr->changePassword();
                 break;
             case 6:
                 user.logout();
@@ -230,13 +229,8 @@ void PCHandler::addSlave()
     std::string slaveAdressToSend = "B," + std::to_string(slaveAdress) + "," + std::to_string(roomNumber);
     std::cout << "Slave adress and room number: " << slaveAdressToSend << std::endl;
 
-    /*
-        const char *slaveAdressChar = slaveAdressToSend.c_str();
-
-        // Send the slave adress and room number to the arduino
-        arduino->writeSerialPort(slaveAdressChar, DATA_LENGTH);
-
-        */
+    const char *slaveAdressChar = slaveAdressToSend.c_str();
+    sendData(slaveAdressChar);
 
     nextMenu();
 }
@@ -347,6 +341,12 @@ void PCHandler::setRooms()
     std::cout << "Enter the number of rooms: " << std::endl;
     std::cin >> amountOfRooms;
     db->saveData("rooms.txt", std::to_string(amountOfRooms), false);
+
+    std::string data = "E," + std::to_string(amountOfRooms);
+
+    const char *sendString = data.c_str();
+    amountToSend = 1;
+    sendData(sendString);
 }
 
 void PCHandler::setUsers()
@@ -356,16 +356,20 @@ void PCHandler::setUsers()
         << "Enter the number of rooms: " << std::endl;
     std::cin >> amountOfUsers;
     db->saveData("users.txt", std::to_string(amountOfRooms), false);
+
+    std::string data = "E," + std::to_string(amountOfUsers);
+
+    const char *sendString = data.c_str();
+    amountToSend = 1;
+    sendData(sendString);
 }
 
-void PCHandler::calibrateSystem()
+void PCHandler::sendData(const char *sendString)
 {
-
-    const char *sendString = "D,init";
-
-    arduino = new SerialPort(portName);
-
-    arduino->isConnected();
+    if (!arduino->isConnected())
+    {
+        arduino = new SerialPort(portName);
+    }
 
     if (arduino->isConnected())
     {
@@ -373,15 +377,47 @@ void PCHandler::calibrateSystem()
         if (hasWritten)
         {
             std::cout << "Data written successfully." << std::endl;
+            amountToSend--;
         }
         else
         {
             std::cout << "Data was not written." << std::endl;
         }
     }
+    if (amountToSend == 0)
+    {
+        arduino->~SerialPort(); // Destructor
+    }
+}
 
-    arduino->~SerialPort(); // Destructor
-    nextMenu();             // Next menu function doesnt work on const function
+void PCHandler::calibrateSystem()
+{
+
+    const char *sendString = "D,init";
+
+    sendData(sendString);
+
+    /* MIGHT BE UNNECESSARY IF sendDATA WORKS
+        arduino = new SerialPort(portName);
+
+        arduino->isConnected();
+
+        if (arduino->isConnected())
+        {
+            bool hasWritten = arduino->writeSerialPort(sendString, DATA_LENGTH);
+            if (hasWritten)
+            {
+                std::cout << "Data written successfully." << std::endl;
+            }
+            else
+            {
+                std::cout << "Data was not written." << std::endl;
+            }
+        }
+
+        arduino->~SerialPort(); // Destructor
+        */
+    nextMenu(); // Next menu function doesnt work on const function
 }
 
 bool PCHandler::isValidBinary(const std::string &input)
@@ -465,6 +501,8 @@ void PCHandler::selectRoomConnection()
         }
     }
 
+    std::string data = "C," + std::to_string(roomNumber) + "," + roomConnections;
+    sendData(data.c_str());
     nextMenu();
 }
 
@@ -609,6 +647,7 @@ void PCHandler::printSystemInfo()
     std::cout << "Current Log: " << std::endl;
     std::vector<int> log = formatLog();
     printLog(log);
+    nextMenu();
 }
 
 void PCHandler::checkIfInitialised()
@@ -621,8 +660,28 @@ void PCHandler::checkIfInitialised()
     else
     {
         std::cout << "Please initialise the system" << std::endl;
+        amountToSend++;
         setRooms();
+        amountToSend--;
         setUsers();
         nextMenu();
     }
+}
+
+void PCHandler::initialiseSystem()
+{
+    int amountOfSlaves;
+    std::cout << "Initialising system..." << std::endl;
+    std::cout << "Define how many slaves you want to set: " << std::endl;
+    std::cin >> amountOfSlaves;
+    amountToSend = amountOfSlaves;
+
+    setRooms();
+    setUsers();
+
+    for (int i = 0; i < amountOfSlaves; i++)
+    {
+        addSlave();
+    }
+    nextMenu();
 }

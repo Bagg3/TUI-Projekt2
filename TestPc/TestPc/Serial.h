@@ -13,6 +13,7 @@ A = Send log from master
 B = New slave
 C = Room connections
 D = Initialise system
+E = Amount of rooms and users
 */
 
 class SerialPort

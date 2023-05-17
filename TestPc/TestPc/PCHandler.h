@@ -29,6 +29,11 @@ public:
     void selectRoomConnection();
 
     void calibrateSystem();
+
+    void sendData(const char *sendString);
+
+    void initialiseSystem();
+
     void changeLog();
 
     void nextMenu();
@@ -45,6 +50,7 @@ public:
 private:
     int amountOfRooms;
     int amountOfUsers;
+    int amountToSend;
     User user;
     User *userPtr;
     SerialPort *arduino;
