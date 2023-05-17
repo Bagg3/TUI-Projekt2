@@ -8,28 +8,30 @@
 class User
 {
 private:
-    // Variables
-    std::string password_;
-    bool isLoggedIn_;
-    dbHandler db;
+	// Variables
+	std::string password_;
+	bool isLoggedIn_;
+	dbHandler db;
 
 public:
-    User(std::string password = "admin");
+	User();
+	User(dbHandler dataBase, std::string password = "admin");
 
-    // Function to login to the system, checks if the username and password are correct, Return if the login is true og not
-    void login();
 
-    // Function to logout of the system
-    void logout();
+	// Function to login to the system, checks if the username and password are correct, Return if the login is true og not
+	void login();
 
-    // Function to check if the user is logged in
-    bool isLoggedIn();
+	// Function to logout of the system
+	void logout();
 
-    // Function to change the password of the user, username
-    void changePassword();
+	// Function to check if the user is logged in
+	bool isLoggedIn();
 
-    // Function to clear the terminal
-    void clearScreen() const;
+	// Function to change the password of the user, username
+	void changePassword();
+
+	// Function to clear the terminal
+	void clearScreen() const;
 };
 
 #endif

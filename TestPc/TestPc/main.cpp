@@ -3,19 +3,20 @@
 #include "User.h"
 #include "PCHandler.h"
 
+#define portName "\\\\.\\COM3"
+
 int main()
 {
-	// User user("admin");
-	//  SerialPort arduino(portName);
+	dbHandler db;
+	User admin(db);
+	SerialPort arduino(portName);
 
-	PCHandler PC("admin");
+	PCHandler PC(&admin, &arduino, &db);
 	PC.clearScreen();
 	PC.showMenu();
 
 	return 0;
 }
-
-
 
 /*
 # include<windows.h>

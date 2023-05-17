@@ -4,13 +4,14 @@
 #pragma once
 #include "User.h"
 #include "Serial.h"
+#include "dbHandler.h"
 #include <vector>
 
 class PCHandler
 {
 public:
     PCHandler(std::string password = "admin");
-    PCHandler(User *admin, SerialPort *arduino);
+    PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase);
 
     void showMenu();
 
@@ -43,6 +44,7 @@ private:
     User user;
     User *userPtr;
     SerialPort *arduino;
+    dbHandler *db;
     const char *portName = "\\\\.\\COM3";
 };
 

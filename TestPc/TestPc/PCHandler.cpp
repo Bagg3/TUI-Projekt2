@@ -17,10 +17,11 @@ PCHandler::PCHandler(std::string password)
     amountOfUsers = 10;
 }
 
-PCHandler::PCHandler(User *admin, SerialPort *arduino)
+PCHandler::PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase)
 {
     userPtr = admin;
     this->arduino = arduino;
+    db = dataBase;
     amountOfRooms = 10;
     amountOfUsers = 10;
 }
@@ -271,7 +272,7 @@ std::vector<std::string> PCHandler::getLog()
                 receivedData.clear();
             }
         }
-        if (data.size() == amountOfUsers)
+        if (data.size() == amountOfUsers || !arduino->isConnected())
         {
             arduino->closeSerial();
         }
@@ -494,6 +495,7 @@ void PCHandler::changeLog()
         }
     }
 
+    updateLog(log);
     nextMenu();
 }
 
@@ -516,7 +518,7 @@ void PCHandler::clearScreen() const
 std::vector<int> PCHandler::formatLog()
 {
     std::vector<std::string> data = getLog();
-    std::vector<int> highestRooms; // Vector to store the highest room numbers
+    std::vector<int> log; // Vector to store the highest room numbers
 
     for (int j = 0; j < data.size(); j++)
     {
@@ -549,18 +551,22 @@ std::vector<int> PCHandler::formatLog()
         }
 
         // Save the highest room number in the vector
-        highestRooms.push_back(highestRoom);
+        log.push_back(highestRoom);
     }
-    return highestRooms;
+
+    updateLog(log); // Update the log with the highest room numbers
+    return log;
 }
 
-void updateLog(std::vector<int> log)
+void PCHandler::updateLog(std::vector<int> log)
 {
-    std::ofstream myfile;
-    myfile.open("log.txt");
+    // Convert the log to a string
+    std::string logString = "";
     for (int i = 0; i < log.size(); i++)
     {
-        myfile << log[i] << " ";
+        logString += std::to_string(log[i]);
+        logString += " ";
     }
-    myfile.close();
+
+    db->saveData("log.txt", logString, false);
 }

@@ -1,4 +1,8 @@
-﻿  PCHandler.cpp
-C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\TestPc\PCHandler.cpp(441,39): warning C4101: 'e': unreferenced local variable
-C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\TestPc\PCHandler.cpp(445,35): warning C4101: 'e': unreferenced local variable
+﻿  main.cpp
+  PCHandler.cpp
+C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\TestPc\PCHandler.cpp(399,45): warning C4101: 'e': unreferenced local variable
+C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\TestPc\PCHandler.cpp(403,41): warning C4101: 'e': unreferenced local variable
+  User.cpp
+  Generating Code...
+  LINK : C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\x64\Debug\TestPc.exe not found or not built by the last incremental link; performing full link
   TestPc.vcxproj -> C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\x64\Debug\TestPc.exe

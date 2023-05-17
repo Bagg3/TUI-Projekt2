@@ -45,4 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="key.txt" />
+    <Text Include="db.txt" />
+    <Text Include="log.txt" />
+  </ItemGroup>
 </Project>

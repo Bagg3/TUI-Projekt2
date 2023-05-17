@@ -139,6 +139,11 @@
     <ClInclude Include="Serial.h" />
     <ClInclude Include="User.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="db.txt" />
+    <Text Include="key.txt" />
+    <Text Include="log.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
