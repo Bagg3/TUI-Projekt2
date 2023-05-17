@@ -13,6 +13,7 @@ std::string receivedData;
 PCHandler::PCHandler(std::string password)
 {
     User admin(password);
+
     amountOfRooms = 10;
     amountOfUsers = 10;
 }
@@ -22,8 +23,6 @@ PCHandler::PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase)
     userPtr = admin;
     this->arduino = arduino;
     db = dataBase;
-    amountOfRooms = 10;
-    amountOfUsers = 10;
 }
 
 void PCHandler::showMenu()
@@ -34,6 +33,8 @@ void PCHandler::showMenu()
         int choice = 0;
 
         user.login();
+
+        checkIfInitialised();
 
         while (user.isLoggedIn())
         {
@@ -60,7 +61,7 @@ void PCHandler::showMenu()
                 changeSystem();
                 break;
             case 3:
-                initialiseSystem();
+                calibrateSystem();
                 break;
             case 4:
                 changeLog();
@@ -144,7 +145,8 @@ void PCHandler::changeSystem()
         std::cout << "2. Select room connection" << std::endl;
         std::cout << "3. Change amounts of rooms" << std::endl;
         std::cout << "4. Change amounts of users" << std::endl;
-        std::cout << "5. Go Back" << std::endl;
+        std::cout << "5. Calibrate the system" << std::endl;
+        std::cout << "6. Go Back" << std::endl;
 
         std::cin >> choice;
 
@@ -163,6 +165,9 @@ void PCHandler::changeSystem()
             setUsers();
             break;
         case 5:
+            calibrateSystem();
+            break;
+        case 6:
             goBack = true;
             break;
         default:
@@ -199,18 +204,6 @@ void PCHandler::addSlave()
             std::cout << "Invalid choice. Please choose again." << std::endl;
         }
     }
-
-    /* Calls the function that checks if the input is a valid binary number
-            if (isValidBinary(slaveAdress))
-            {
-                std::cout << "You chose to change the slave adress to " << slaveAdress << std::endl;
-                validChoice = true;
-            }
-            else
-            {
-                std::cout << "Invalid choice. Please choose again." << std::endl;
-            }
-            */
 
     validChoice = false;
     while (!validChoice)
@@ -353,6 +346,7 @@ void PCHandler::setRooms()
     userPtr->clearScreen();
     std::cout << "Enter the number of rooms: " << std::endl;
     std::cin >> amountOfRooms;
+    db->saveData("rooms.txt", std::to_string(amountOfRooms), false);
 }
 
 void PCHandler::setUsers()
@@ -361,9 +355,10 @@ void PCHandler::setUsers()
     std::cout
         << "Enter the number of rooms: " << std::endl;
     std::cin >> amountOfUsers;
+    db->saveData("users.txt", std::to_string(amountOfRooms), false);
 }
 
-void PCHandler::initialiseSystem()
+void PCHandler::calibrateSystem()
 {
 
     const char *sendString = "D,init";
@@ -604,4 +599,30 @@ void PCHandler::updateLog(std::vector<int> log)
     }
 
     db->saveData("log.txt", logString, false);
+}
+
+void PCHandler::printSystemInfo()
+{
+    std::cout << "System information: " << std::endl;
+    std::cout << "Amount of rooms: " << amountOfRooms << std::endl;
+    std::cout << "Amount of users: " << amountOfUsers << std::endl;
+    std::cout << "Current Log: " << std::endl;
+    std::vector<int> log = formatLog();
+    printLog(log);
+}
+
+void PCHandler::checkIfInitialised()
+{
+    if (db->findData("rooms.txt", true) != "" || db->findData("users.txt", true) != "")
+    {
+        amountOfRooms = std::stoi(db->findData("rooms.txt", false));
+        amountOfUsers = std::stoi(db->findData("users.txt", false));
+    }
+    else
+    {
+        std::cout << "Please initialise the system" << std::endl;
+        setRooms();
+        setUsers();
+        nextMenu();
+    }
 }

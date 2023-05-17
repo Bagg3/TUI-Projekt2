@@ -28,7 +28,7 @@ public:
     void setUsers();
     void selectRoomConnection();
 
-    void initialiseSystem();
+    void calibrateSystem();
     void changeLog();
 
     void nextMenu();
@@ -37,6 +37,10 @@ public:
     bool isValidRoom(const std::string &input);
 
     void updateLog(std::vector<int> log);
+
+    void printSystemInfo();
+
+    void checkIfInitialised();
 
 private:
     int amountOfRooms;

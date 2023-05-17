@@ -6,7 +6,15 @@
 // Constructor with default dbHost - folder name of the database
 dbHandler::dbHandler(std::string dbHost)
 {
-	dbHost_ = dbHost;
+	dbHost = dbHost;
+	if (findData("saveOnline.txt", false) == "true")
+	{
+		bool saveOnline = true;
+	}
+	else
+	{
+		bool saveOnline = false;
+	}
 }
 
 // Function to cipher/decipher data with XOR cipher
@@ -21,87 +29,96 @@ std::string dbHandler::xorCipher(std::string data, char key)
 }
 
 // Decrypt data from file, using key from key.txt, where fileAdress is the name of the file in UserDB folder
-std::string dbHandler::findData(std::string fileAdress, bool decrypt)
+std::string dbHandler::findData(const std::string &fileAdress, bool decrypt)
 {
-	// Tries to open file, if it fails, throws an error
+	std::ifstream file(dbHost + fileAdress);
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+
 	std::string data;
-	std::ifstream file;
-	file.open(dbHost_ + fileAdress);
-	if (file.is_open())
+	std::string line;
+	while (getline(file, line))
 	{
-		std::string line;
-		while (getline(file, line))
-		{
-			data += line;
-		}
-		file.close();
+		data += line;
 	}
-	else
-	{
-		std::cout << "Unable to open file";
-	}
+	file.close();
 
 	if (!decrypt)
 	{
 		return data;
 	}
 
-	char key;
-	// Load key from key file
-	std::ifstream keyFile;
-	keyFile.open(dbHost_ + "key.txt");
-	if (keyFile.is_open())
-	{
-		std::string line;
-		getline(keyFile, line);
-		key = line[0];
-		keyFile.close();
-	}
-	else
-	{
-		throw std::runtime_error("Unable to open file");
-	}
-	// Returns the deciphered data
+	char key = loadKeyFromFile();
+
 	return xorCipher(data, key);
 }
 
 // Encrypt data to file, using key from key.txt, where fileAdress is the name of the file in UserDB folder
 void dbHandler::saveData(std::string fileAdress, std::string data, bool encrypt)
 {
-	// Load key from key file
 
-	if (!encrypt) {
-		std::ofstream file;
-		file.open(dbHost_ + fileAdress);
-		if (file.is_open())
+	if (!encrypt)
+	{
+		std::ofstream file1(dbHost + fileAdress);
+		if (file1.is_open())
 		{
-			file << data;
-			file.close();
+			file1 << data;
+			file1.close();
 		}
 		else
 		{
 			throw std::runtime_error("Unable to open file");
 		}
+
+		if (saveOnline)
+		{
+			std::ofstream file2(dbHostOnline + fileAdress);
+			if (file2.is_open())
+			{
+				file2 << data;
+				file2.close();
+			}
+			else
+			{
+				throw std::runtime_error("Unable to open file");
+			}
+		}
 		return;
 	}
 
-	char key;
-	std::ifstream keyFile;
-	keyFile.open(dbHost_ + "key.txt");
+	// Load key from key file
+	char key = loadKeyFromFile();
+	// Saves the ciphered data to file
+
+	saveCipheredDataToFile(fileAdress, data, key);
+}
+
+char dbHandler::loadKeyFromFile()
+{
+	std::ifstream keyFile(dbHost + "key.txt");
 	if (keyFile.is_open())
 	{
 		std::string line;
 		getline(keyFile, line);
-		key = line[0];
 		keyFile.close();
+		return line[0];
 	}
 	else
 	{
 		throw std::runtime_error("Unable to open file");
 	}
-	// Saves the ciphered data to file
-	std::ofstream file;
-	file.open(dbHost_ + fileAdress);
+}
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <stdexcept>
+
+void dbHandler::saveCipheredDataToFile(const std::string &fileAdress, const std::string &data, char key)
+{
+	std::ofstream file(dbHost + fileAdress);
 	if (file.is_open())
 	{
 		file << xorCipher(data, key);
