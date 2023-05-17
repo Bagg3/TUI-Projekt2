@@ -5,7 +5,7 @@
 
 #define portName "\\\\.\\COM3"
 
-// ÆNDRER I SET USERS SÅ HAN VED HVAD DER BLIVER SENDT
+// CHANGE CHANGELOG TO VALIDATE INPUT
 int main()
 {
 	// Setting up objects and dependcies

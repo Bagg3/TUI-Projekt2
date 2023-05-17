@@ -102,7 +102,8 @@ void PCHandler::printData()
         std::cout << "Please choose an option:" << std::endl;
         std::cout << "1. Print Formatet Log" << std::endl;
         std::cout << "2. Print Raw Data" << std::endl;
-        std::cout << "3. Go Back" << std::endl
+        std::cout << "3. Print System Info" << std::endl;
+        std::cout << "4. Go Back" << std::endl
                   << std::endl;
 
         std::cin >> choice;
@@ -118,6 +119,9 @@ void PCHandler::printData()
             printRawData();
             break;
         case 3:
+            printSystemInfo();
+            break;
+        case 4:
             goBack = true;
             break;
         default:
@@ -142,10 +146,9 @@ void PCHandler::changeSystem()
         std::cout << "Please choose an option:" << std::endl;
         std::cout << "1. Add a new slave" << std::endl;
         std::cout << "2. Select room connection" << std::endl;
-        std::cout << "3. Change amounts of rooms" << std::endl;
-        std::cout << "4. Change amounts of users" << std::endl;
-        std::cout << "5. Calibrate the system" << std::endl;
-        std::cout << "6. Go Back" << std::endl;
+        std::cout << "3. Calibrate the system" << std::endl;
+        std::cout << "4. Change name of rooms or persons" << std::endl;
+        std::cout << "5. Go Back" << std::endl;
 
         std::cin >> choice;
 
@@ -158,15 +161,12 @@ void PCHandler::changeSystem()
             selectRoomConnection();
             break;
         case 3:
-            setRooms();
-            break;
-        case 4:
-            setUsers();
-            break;
-        case 5:
             calibrateSystem();
             break;
-        case 6:
+        case 4:
+            // Change name of rooms or persons
+            break;
+        case 5:
             goBack = true;
             break;
         default:
@@ -337,35 +337,50 @@ void PCHandler::printRawData()
 
 void PCHandler::setRooms()
 {
-    userPtr->clearScreen();
-    std::cout << "Enter the number of rooms: " << std::endl;
-    std::cin >> amountOfRooms;
+    bool validChoice = false;
+    while (!validChoice)
+    {
+        userPtr->clearScreen();
+        std::cout << "Enter the number of rooms: " << std::endl;
+        std::cin >> amountOfRooms;
+        if (amountOfRooms >= 1 && amountOfRooms <= 256)
+        {
+            validChoice = true;
+            break;
+        }
+        else
+        {
+            std::cout << "Invalid choice. Please choose again." << std::endl;
+        }
+    }
+
     db->saveData("rooms.txt", std::to_string(amountOfRooms), false);
-
-    std::string data = "E," + std::to_string(amountOfRooms);
-
-    const char *sendString = data.c_str();
-    amountToSend = 1;
-    sendData(sendString);
 }
 
 void PCHandler::setUsers()
 {
-    userPtr->clearScreen();
-    std::cout
-        << "Enter the number of rooms: " << std::endl;
-    std::cin >> amountOfUsers;
+    bool validChoice = false;
+    while (!validChoice)
+    {
+        userPtr->clearScreen();
+        std::cout << "Enter the number of user: " << std::endl;
+        std::cin >> amountOfRooms;
+        if (amountOfUsers >= 1 && amountOfUsers <= 256)
+        {
+            validChoice = true;
+            break;
+        }
+        else
+        {
+            std::cout << "Invalid choice. Please choose again." << std::endl;
+        }
+    }
     db->saveData("users.txt", std::to_string(amountOfRooms), false);
-
-    std::string data = "E," + std::to_string(amountOfUsers);
-
-    const char *sendString = data.c_str();
-    amountToSend = 1;
-    sendData(sendString);
 }
 
 void PCHandler::sendData(const char *sendString)
 {
+
     if (!arduino->isConnected())
     {
         arduino = new SerialPort(portName);
@@ -418,22 +433,6 @@ void PCHandler::calibrateSystem()
         arduino->~SerialPort(); // Destructor
         */
     nextMenu(); // Next menu function doesnt work on const function
-}
-
-bool PCHandler::isValidBinary(const std::string &input)
-{
-    // Check if the input has exactly 8 characters
-    if (input.length() != 8)
-        return false;
-
-    // Check if each character is either '0' or '1'
-    for (char c : input)
-    {
-        if (c != '0' && c != '1')
-            return false;
-    }
-
-    return true;
 }
 
 bool PCHandler::isValidRoom(const std::string &input)
@@ -561,17 +560,6 @@ void PCHandler::nextMenu()
     _getch();
 }
 
-/*
-void PCHandler::userPtr->clearScreen() const
-{
-    // Clears the terminal and prints the title
-    system("cls");                                                      // Code to clear the screen
-    std::cout << "Intelligent Pattern Recognition System" << std::endl; // "IPRS SYSTEM
-    std::cout << std::endl
-              << std::endl;
-}
-*/
-
 std::vector<int> PCHandler::formatLog()
 {
     std::vector<std::string> data = getLog();
@@ -659,12 +647,16 @@ void PCHandler::checkIfInitialised()
     }
     else
     {
-        std::cout << "Please initialise the system" << std::endl;
-        amountToSend++;
-        setRooms();
-        amountToSend--;
-        setUsers();
-        nextMenu();
+        std::cout << "Do you wan to initialise the system?" << std::endl;
+        std::cout << "1. Yes" << std::endl;
+        std::cout << "2. No" << std::endl;
+        int choice;
+        std::cin >> choice;
+
+        if (choice == 1)
+        {
+            initialiseSystem();
+        }
     }
 }
 
@@ -672,12 +664,17 @@ void PCHandler::initialiseSystem()
 {
     int amountOfSlaves;
     std::cout << "Initialising system..." << std::endl;
-    std::cout << "Define how many slaves you want to set: " << std::endl;
-    std::cin >> amountOfSlaves;
-    amountToSend = amountOfSlaves;
 
     setRooms();
     setUsers();
+
+    amountToSend++;
+    std::string data = "E," + std::to_string(amountOfRooms) + "," + std::to_string(amountOfUsers);
+    sendData(data.c_str());
+
+    std::cout << "Define how many slaves you want to set: " << std::endl;
+    std::cin >> amountOfSlaves;
+    amountToSend = amountOfSlaves - 1;
 
     for (int i = 0; i < amountOfSlaves; i++)
     {

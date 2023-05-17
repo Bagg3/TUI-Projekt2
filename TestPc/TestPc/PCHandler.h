@@ -21,6 +21,7 @@ public:
     std::vector<int> formatLog();
     void printLog(std::vector<int> log);
     void printRawData();
+    void printSystemInfo();
 
     void changeSystem();
     void addSlave();
@@ -37,13 +38,10 @@ public:
     void changeLog();
 
     void nextMenu();
-    bool isValidBinary(const std::string &input);
-    // void clearScreen() const;
+
     bool isValidRoom(const std::string &input);
 
     void updateLog(std::vector<int> log);
-
-    void printSystemInfo();
 
     void checkIfInitialised();
 

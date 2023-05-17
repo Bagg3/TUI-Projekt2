@@ -12,8 +12,8 @@ PROTOCOL TO MASTER
 A = Send log from master
 B = New slave
 C = Room connections
-D = Initialise system
-E = Amount of rooms and users
+D = Calibrate system
+E = Initialise system
 */
 
 class SerialPort
