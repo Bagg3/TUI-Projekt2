@@ -12,23 +12,30 @@ public:
     PCHandler(std::string password = "admin");
     PCHandler(User *admin, SerialPort *arduino);
 
+    void showMenu();
+
+    void printData();
+
     std::vector<std::string> getLog();
-    void printLog();
+    std::vector<int> formatLog();
+    void printLog(std::vector<int> log);
     void printRawData();
 
-    void selectRoomConnection();
-    void showMenu();
-    void printData();
     void changeSystem();
     void addSlave();
     void setRooms();
     void setUsers();
-    void initialiseSystem() const;
+    void selectRoomConnection();
+
+    void initialiseSystem();
+    void changeLog();
+
+    void nextMenu();
     bool isValidBinary(const std::string &input);
     void clearScreen() const;
     bool isValidRoom(const std::string &input);
-    void changeLog();
-    void nextMenu();
+
+    void updateLog(std::vector<int> log);
 
 private:
     int amountOfRooms;
@@ -36,6 +43,7 @@ private:
     User user;
     User *userPtr;
     SerialPort *arduino;
+    const char *portName = "\\\\.\\COM3";
 };
 
 #endif

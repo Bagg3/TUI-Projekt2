@@ -3,9 +3,10 @@
 #include <vector>
 #include <conio.h>
 #include <sstream>
+#include <fstream>
 
 #define DATA_LENGTH 255
-const char *portName = "\\\\.\\COM3";
+// const char* portName = "\\\\.\\COM3";
 SerialPort *arduino;
 std::string receivedData;
 
@@ -91,6 +92,7 @@ void PCHandler::printData()
 {
     int choice = 0;
     bool goBack = false;
+    std::vector<int> log;
 
     while (!goBack)
     {
@@ -99,14 +101,17 @@ void PCHandler::printData()
         std::cout << "Please choose an option:" << std::endl;
         std::cout << "1. Print Formatet Log" << std::endl;
         std::cout << "2. Print Raw Data" << std::endl;
-        std::cout << "3. Go Back" << std::endl;
+        std::cout << "3. Go Back" << std::endl
+                  << std::endl;
 
         std::cin >> choice;
 
         switch (choice)
         {
         case 1:
-            printLog();
+            log = formatLog();
+            printLog(log);
+            nextMenu();
             break;
         case 2:
             printRawData();
@@ -161,7 +166,6 @@ void PCHandler::changeSystem()
             break;
         default:
             std::cout << "Invalid choice. Please choose again. Press any key to continue" << std::endl;
-            _getch();
             break;
         }
 
@@ -175,16 +179,16 @@ void PCHandler::addSlave()
 
     // Instantiate of variables
     bool validChoice = false;
-    std::string slaveAdress;
+    int slaveAdress;
     int roomNumber;
 
     // Makes sure the user inputs a valid binary number
     while (!validChoice)
     {
-        std::cout << "Input the slave address in decimals: " << std::endl;
+        std::cout << "Input the slave address in a valid whole number in the interval 1-255: " << std::endl;
         std::cin >> slaveAdress;
 
-        if (slaveAdress >= "1" && slaveAdress <= "255")
+        if (slaveAdress >= 1 && slaveAdress <= 255)
         {
             std::cout << "You chose to change the slave adress to " << slaveAdress << std::endl;
             validChoice = true;
@@ -211,9 +215,12 @@ void PCHandler::addSlave()
     while (!validChoice)
     {
         std::cout << std::endl
-                  << "Input the room number: " << std::endl;
+                  << "Input the room number, valid room are 1-" << amountOfRooms << ":" << std::endl;
+        std::cout << "If the slave is between rooms format it as 'X00N', where X and N are the two rooms" << std::endl;
+        std::cout << "If the slave works with an ID-Sensor format it as 'X00X', where X is the room" << std::endl;
+
         std::cin >> roomNumber;
-        if (roomNumber >= 0 && roomNumber <= amountOfRooms)
+        if (roomNumber >= 1 && roomNumber <= 256256)
         {
             std::cout << "You chose to change the number of slaves to " << roomNumber << std::endl;
             validChoice = true;
@@ -226,10 +233,8 @@ void PCHandler::addSlave()
     }
 
     // Convert the slave adress and room number to a string
-    slaveAdress += "," + std::to_string(roomNumber);
-    std::string slaveAdresstoSend = "B," + slaveAdress;
-
-    std::cout << "Slave adress and room number: " << slaveAdress << std::endl;
+    std::string slaveAdressToSend = "B," + std::to_string(slaveAdress) + "," + std::to_string(roomNumber);
+    std::cout << "Slave adress and room number: " << slaveAdressToSend << std::endl;
 
     /*
         const char *slaveAdressChar = slaveAdressToSend.c_str();
@@ -269,7 +274,6 @@ std::vector<std::string> PCHandler::getLog()
         if (data.size() == amountOfUsers)
         {
             arduino->closeSerial();
-            arduino->~SerialPort();
         }
     }
 
@@ -298,56 +302,15 @@ std::vector<std::string> PCHandler::getLog()
     return data;
 }
 
-void PCHandler::printLog()
+void PCHandler::printLog(std::vector<int> log)
 {
-    std::vector<std::string> data = getLog();
-    std::vector<int> highestRooms; // Vector to store the highest room numbers
+    clearScreen();
 
-    for (int j = 0; j < data.size(); j++)
+    // Print the highest room number for the person
+    for (int i = 0; i < log.size(); i++)
     {
-        data[j].push_back(' ');
-
-        // Function to convert example to int array, split on " "
-        std::string delimiter = " ";
-        size_t pos = 0;
-        std::string token;
-        int i = 0;
-        int arr[10];
-        while ((pos = data[j].find(delimiter)) != std::string::npos)
-        {
-            token = data[j].substr(0, pos);
-            arr[i] = std::stoi(token);
-            data[j].erase(0, pos + delimiter.length());
-            i++;
-        }
-
-        // Find the highest value in the array
-        int highest = 0;
-        int highestRoom = 0;
-        for (int k = 0; k < amountOfRooms; k++)
-        {
-            if (arr[k] > highest)
-            {
-                highest = arr[k];
-                highestRoom = k + 1; // Add +1 to get the room number
-            }
-        }
-
-        // Save the highest room number in the vector
-        highestRooms.push_back(highestRoom);
-
-        // Print the highest room number for the person
-        std::cout << "Person " << (j + 1) << " is in Room " << highestRoom << std::endl;
+        std::cout << "Person " << (i + 1) << " is in Room " << log[i] << std::endl;
     }
-
-    /* Print the highest room numbers
-    for (int i = 0; i < highestRooms.size(); i++)
-    {
-        std::cout << "Person " << (i + 1) << ": Room " << highestRooms[i] << std::endl;
-    }
-    */
-
-    nextMenu();
 }
 
 void PCHandler::printRawData()
@@ -364,35 +327,43 @@ void PCHandler::printRawData()
 
 void PCHandler::setRooms()
 {
+    clearScreen();
     std::cout << "Enter the number of rooms: " << std::endl;
     std::cin >> amountOfRooms;
 }
 
 void PCHandler::setUsers()
 {
-    std::cout << "Enter the number of rooms: " << std::endl;
+    clearScreen();
+    std::cout
+        << "Enter the number of rooms: " << std::endl;
     std::cin >> amountOfUsers;
 }
 
-void PCHandler::initialiseSystem() const
+void PCHandler::initialiseSystem()
 {
-    clearScreen();
-    /*
-        const char *sendString = "D,1,2,3";
 
-        arduino->isConnected();
+    const char *sendString = "D,init";
 
-        if (arduino->isConnected())
+    arduino = new SerialPort(portName);
+
+    arduino->isConnected();
+
+    if (arduino->isConnected())
+    {
+        bool hasWritten = arduino->writeSerialPort(sendString, DATA_LENGTH);
+        if (hasWritten)
         {
-            bool hasWritten = arduino->writeSerialPort(sendString, DATA_LENGTH);
-            if (hasWritten)
-            {
-                std::cout << "Data written successfully." << std::endl;
-            }
+            std::cout << "Data written successfully." << std::endl;
         }
+        else
+        {
+            std::cout << "Data was not written." << std::endl;
+        }
+    }
 
-        */
-    _getch(); // Next menu function doesnt work on const function
+    arduino->~SerialPort(); // Destructor
+    nextMenu();             // Next menu function doesnt work on const function
 }
 
 bool PCHandler::isValidBinary(const std::string &input)
@@ -481,7 +452,49 @@ void PCHandler::selectRoomConnection()
 
 void PCHandler::changeLog()
 {
-    std::vector<std::string> data = getLog();
+
+    std::vector<int> log = formatLog();
+    int personNumber;
+    int roomNumber;
+    bool goBack = false;
+    while (!goBack)
+    {
+        clearScreen();
+        printLog(log);
+        std::cout << std::endl
+                  << "Select the person number you want to change the room of: " << std::endl;
+        std::cout << "Press 0 to go back" << std::endl
+                  << std::endl;
+        std::cin >> personNumber;
+
+        if (personNumber == 0)
+        {
+            goBack = true;
+            break;
+        }
+        /* if (personNumber >= 1 && personNumber <= amountOfUsers)
+         {
+             std::cout << "Select the room number you want to change to: " << std::endl;
+         }
+         */
+
+        std::cout << std::endl
+                  << "Select the room number you want to change to: " << std::endl;
+        std::cin >> roomNumber;
+
+        if (roomNumber == 0)
+        {
+            goBack = true;
+            break;
+        }
+
+        if (personNumber != 0 || roomNumber != 0)
+        {
+            log[personNumber - 1] = roomNumber;
+        }
+    }
+
+    nextMenu();
 }
 
 void PCHandler::nextMenu()
@@ -498,4 +511,56 @@ void PCHandler::clearScreen() const
     std::cout << "Intelligent Pattern Recognition System" << std::endl; // "IPRS SYSTEM
     std::cout << std::endl
               << std::endl;
+}
+
+std::vector<int> PCHandler::formatLog()
+{
+    std::vector<std::string> data = getLog();
+    std::vector<int> highestRooms; // Vector to store the highest room numbers
+
+    for (int j = 0; j < data.size(); j++)
+    {
+        data[j].push_back(' ');
+
+        // Function to convert example to int array, split on " "
+        std::string delimiter = " ";
+        size_t pos = 0;
+        std::string token;
+        int i = 0;
+        int arr[10];
+        while ((pos = data[j].find(delimiter)) != std::string::npos)
+        {
+            token = data[j].substr(0, pos);
+            arr[i] = std::stoi(token);
+            data[j].erase(0, pos + delimiter.length());
+            i++;
+        }
+
+        // Find the highest value in the array
+        int highest = 0;
+        int highestRoom = 0;
+        for (int k = 0; k < amountOfRooms; k++)
+        {
+            if (arr[k] > highest)
+            {
+                highest = arr[k];
+                highestRoom = k + 1; // Add +1 to get the room number
+            }
+        }
+
+        // Save the highest room number in the vector
+        highestRooms.push_back(highestRoom);
+    }
+    return highestRooms;
+}
+
+void updateLog(std::vector<int> log)
+{
+    std::ofstream myfile;
+    myfile.open("log.txt");
+    for (int i = 0; i < log.size(); i++)
+    {
+        myfile << log[i] << " ";
+    }
+    myfile.close();
 }
