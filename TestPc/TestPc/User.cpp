@@ -4,7 +4,6 @@
 #include <fstream>
 #include <functional>
 
-
 User::User()
 {
 	dbHandler db;
@@ -76,10 +75,10 @@ bool User::isLoggedIn()
 
 void User::changePassword()
 {
+	clearScreen();
 	std::string newPassword;
 	std::cout << "Enter new password: ";
 	std::cin >> newPassword;
 	password_ = newPassword;
-	dbHandler db("../UserDB/");
 	db.saveData("db.txt", newPassword, true);
 }

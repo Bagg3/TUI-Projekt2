@@ -7,12 +7,13 @@
 
 int main()
 {
+	// Setting up objects and dependcies
 	dbHandler db;
 	User admin(db);
 	SerialPort arduino(portName);
 
 	PCHandler PC(&admin, &arduino, &db);
-	PC.clearScreen();
+	admin.clearScreen();
 	PC.showMenu();
 
 	return 0;

@@ -37,7 +37,7 @@ void PCHandler::showMenu()
 
         while (user.isLoggedIn())
         {
-            clearScreen();
+            userPtr->clearScreen();
             // Print the menu
             std::cout << "Please choose an option:" << std::endl;
             std::cout << "1. Print Data" << std::endl;
@@ -84,7 +84,7 @@ void PCHandler::showMenu()
             // Only clears the screen if program is running
             std::cout << std::endl;
             if (running)
-                clearScreen();
+                userPtr->clearScreen();
         }
     }
 }
@@ -97,7 +97,7 @@ void PCHandler::printData()
 
     while (!goBack)
     {
-        clearScreen();
+        userPtr->clearScreen();
         // The various print options
         std::cout << "Please choose an option:" << std::endl;
         std::cout << "1. Print Formatet Log" << std::endl;
@@ -137,7 +137,7 @@ void PCHandler::changeSystem()
 
     while (!goBack)
     {
-        clearScreen();
+        userPtr->clearScreen();
         // The various change system options
         std::cout << "Please choose an option:" << std::endl;
         std::cout << "1. Add a new slave" << std::endl;
@@ -176,7 +176,7 @@ void PCHandler::changeSystem()
 
 void PCHandler::addSlave()
 {
-    clearScreen();
+    userPtr->clearScreen();
 
     // Instantiate of variables
     bool validChoice = false;
@@ -256,6 +256,12 @@ std::vector<std::string> PCHandler::getLog()
     arduino->isConnected();
     std::cout << "Is connected: " << arduino->isConnected() << std::endl;
 
+    bool hasBeenConnected = false;
+    if (arduino->isConnected())
+    {
+        hasBeenConnected = true;
+    }
+
     while (arduino->isConnected())
     {
         char receivedChar;
@@ -278,34 +284,50 @@ std::vector<std::string> PCHandler::getLog()
         }
     }
 
-    std::string string1 = "10 20 40 30 0 0 0 0 0 0";
-    std::string string2 = "20 10 30 20 10 0 0 0 0 0";
-    std::string string3 = "30 0 20 10 10 10 10 0 0 0";
-    std::string string4 = "40 10 20 10 10 0 0 0 0 0";
-    std::string string5 = "0 40 10 20 10 10 0 0 0 0";
-    std::string string6 = "0 0 40 10 20 10 10 0 0 0";
-    std::string string7 = "0 0 0 0 10 20 70 0 0 0";
-    std::string string8 = "0 0 0 0 40 10 20 10 10 0";
-    std::string string9 = "0 0 0 0 0 40 10 20 10 0";
-    std::string string10 = "0 0 40 0 0 0 30 20 10 0";
+    if (!hasBeenConnected)
+    {
+        std::string log;
+        log = db->findData("log.txt", false);
 
-    data.push_back(string1);
-    data.push_back(string2);
-    data.push_back(string3);
-    data.push_back(string4);
-    data.push_back(string5);
-    data.push_back(string6);
-    data.push_back(string7);
-    data.push_back(string8);
-    data.push_back(string9);
-    data.push_back(string10);
+        // Convert the string to a vector of strings with " " as delimiter for each index in the vector
+        std::stringstream ss(log);
+        std::string temp;
+        while (ss >> temp)
+        {
+            data.push_back(temp);
+        }
+    }
 
+    /*
+        std::string string1 = "10 20 40 30 0 0 0 0 0 0";
+        std::string string2 = "20 10 30 20 10 0 0 0 0 0";
+        std::string string3 = "30 0 20 10 10 10 10 0 0 0";
+        std::string string4 = "40 10 20 10 10 0 0 0 0 0";
+        std::string string5 = "0 40 10 20 10 10 0 0 0 0";
+        std::string string6 = "0 0 40 10 20 10 10 0 0 0";
+        std::string string7 = "0 0 0 0 10 20 70 0 0 0";
+        std::string string8 = "0 0 0 0 40 10 20 10 10 0";
+        std::string string9 = "0 0 0 0 0 40 10 20 10 0";
+        std::string string10 = "0 0 40 0 0 0 30 20 10 0";
+
+        data.push_back(string1);
+        data.push_back(string2);
+        data.push_back(string3);
+        data.push_back(string4);
+        data.push_back(string5);
+        data.push_back(string6);
+        data.push_back(string7);
+        data.push_back(string8);
+        data.push_back(string9);
+        data.push_back(string10);
+
+    */
     return data;
 }
 
 void PCHandler::printLog(std::vector<int> log)
 {
-    clearScreen();
+    userPtr->clearScreen();
 
     // Print the highest room number for the person
     for (int i = 0; i < log.size(); i++)
@@ -328,14 +350,14 @@ void PCHandler::printRawData()
 
 void PCHandler::setRooms()
 {
-    clearScreen();
+    userPtr->clearScreen();
     std::cout << "Enter the number of rooms: " << std::endl;
     std::cin >> amountOfRooms;
 }
 
 void PCHandler::setUsers()
 {
-    clearScreen();
+    userPtr->clearScreen();
     std::cout
         << "Enter the number of rooms: " << std::endl;
     std::cin >> amountOfUsers;
@@ -414,7 +436,7 @@ bool PCHandler::isValidRoom(const std::string &input)
 
 void PCHandler::selectRoomConnection()
 {
-    clearScreen();
+    userPtr->clearScreen();
     int roomNumber;
     std::cout << "Select room to specify its connections:" << std::endl;
     bool validChoice = false;
@@ -460,7 +482,7 @@ void PCHandler::changeLog()
     bool goBack = false;
     while (!goBack)
     {
-        clearScreen();
+        userPtr->clearScreen();
         printLog(log);
         std::cout << std::endl
                   << "Select the person number you want to change the room of: " << std::endl;
@@ -480,7 +502,7 @@ void PCHandler::changeLog()
          */
 
         std::cout << std::endl
-                  << "Select the room number you want to change to: " << std::endl;
+                  << "Select the room number you want to change to, valid rooms are 1-" << amountOfRooms << ":" << std::endl;
         std::cin >> roomNumber;
 
         if (roomNumber == 0)
@@ -506,7 +528,8 @@ void PCHandler::nextMenu()
     _getch();
 }
 
-void PCHandler::clearScreen() const
+/*
+void PCHandler::userPtr->clearScreen() const
 {
     // Clears the terminal and prints the title
     system("cls");                                                      // Code to clear the screen
@@ -514,46 +537,58 @@ void PCHandler::clearScreen() const
     std::cout << std::endl
               << std::endl;
 }
+*/
 
 std::vector<int> PCHandler::formatLog()
 {
     std::vector<std::string> data = getLog();
     std::vector<int> log; // Vector to store the highest room numbers
 
-    for (int j = 0; j < data.size(); j++)
+    if (data[0].length() < 2)
     {
-        data[j].push_back(' ');
-
-        // Function to convert example to int array, split on " "
-        std::string delimiter = " ";
-        size_t pos = 0;
-        std::string token;
-        int i = 0;
-        int arr[10];
-        while ((pos = data[j].find(delimiter)) != std::string::npos)
+        for (const std::string &line : data)
         {
-            token = data[j].substr(0, pos);
-            arr[i] = std::stoi(token);
-            data[j].erase(0, pos + delimiter.length());
-            i++;
+            int value = std::stoi(line);
+            log.push_back(value);
         }
-
-        // Find the highest value in the array
-        int highest = 0;
-        int highestRoom = 0;
-        for (int k = 0; k < amountOfRooms; k++)
-        {
-            if (arr[k] > highest)
-            {
-                highest = arr[k];
-                highestRoom = k + 1; // Add +1 to get the room number
-            }
-        }
-
-        // Save the highest room number in the vector
-        log.push_back(highestRoom);
     }
+    else
+    {
+        for (int j = 0; j < data.size(); j++)
+        {
 
+            data[j].push_back(' ');
+
+            // Function to convert example to int array, split on " "
+            std::string delimiter = " ";
+            size_t pos = 0;
+            std::string token;
+            int i = 0;
+            int arr[10];
+            while ((pos = data[j].find(delimiter)) != std::string::npos)
+            {
+                token = data[j].substr(0, pos);
+                arr[i] = std::stoi(token);
+                data[j].erase(0, pos + delimiter.length());
+                i++;
+            }
+
+            // Find the highest value in the array
+            int highest = 0;
+            int highestRoom = 0;
+            for (int k = 0; k < amountOfRooms; k++)
+            {
+                if (arr[k] > highest)
+                {
+                    highest = arr[k];
+                    highestRoom = k + 1; // Add +1 to get the room number
+                }
+            }
+
+            // Save the highest room number in the vector
+            log.push_back(highestRoom);
+        }
+    }
     updateLog(log); // Update the log with the highest room numbers
     return log;
 }

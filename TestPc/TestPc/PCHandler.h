@@ -33,7 +33,7 @@ public:
 
     void nextMenu();
     bool isValidBinary(const std::string &input);
-    void clearScreen() const;
+    // void clearScreen() const;
     bool isValidRoom(const std::string &input);
 
     void updateLog(std::vector<int> log);

@@ -7,20 +7,21 @@ class dbHandler
 
 {
 private:
-	std::string dbHost_;
+    std::string dbHost_;
 
-	// Function to encrypt/decrypt the data
-	std::string xorCipher(std::string data, char key);
+    // Function to encrypt/decrypt the data
+    std::string xorCipher(std::string data, char key);
+
+    std::string laptop = "C:/Users/andre/Documents/GitHub/TUIVSS/TestPc/TestPc/";
 
 public:
-	dbHandler(std::string dbHost = "C:/Users/andre/Documents/GitHub/TUIVSS/TestPc/TestPc/");
-	// C:/Users/andre/Documents/GitHub/TUIVSS/TestPc/TestPc/
+    dbHandler(std::string dbHost = "C:/Users/andre/Documents/GitHub/TUIVSS/TestPc/TestPc/");
 
-	// Decrypts the data from the file and returns it
-	std::string findData(std::string fileAdress, bool decrypt); // Uses try catch syntax
+    // Decrypts the data from the file and returns it
+    std::string findData(std::string fileAdress, bool decrypt); // Uses try catch syntax
 
-	// Encrypts the data and saves it to the file
-	void saveData(std::string fileAdress, std::string data, bool encrypt); // Uses try catch syntax
+    // Encrypts the data and saves it to the file
+    void saveData(std::string fileAdress, std::string data, bool encrypt); // Uses try catch syntax
 };
 
 #endif
