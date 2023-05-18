@@ -13,7 +13,7 @@ User::User()
 
 User::User(dbHandler dataBase, std::string password)
 {
-
+	// Checks if password is empty, if it is, then it will set the password to admin
 	db = dataBase;
 	if (db.findData("db.txt", true) == "")
 	{
@@ -25,15 +25,15 @@ User::User(dbHandler dataBase, std::string password)
 
 void User::clearScreen() const
 {
-	system("cls");                                                      // Code to clear the screen
+	system("cls");														// Code to clear the screen
 	std::cout << "Intelligent Pattern Recognition System" << std::endl; // "IPRS SYSTEM
 	std::cout << std::endl
-		<< std::endl;
+			  << std::endl;
 }
 
 void User::login()
 {
-
+	// Checks if the user is logged in, if not, then it will ask for a password adn check if it is correct
 	while (!isLoggedIn())
 	{
 		clearScreen();
@@ -75,6 +75,7 @@ bool User::isLoggedIn()
 
 void User::changePassword()
 {
+	// Saves the new password to the database
 	clearScreen();
 	std::string newPassword;
 	std::cout << "Enter new password: ";

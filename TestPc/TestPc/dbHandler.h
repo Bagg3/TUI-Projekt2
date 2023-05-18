@@ -21,7 +21,7 @@ public:
     bool getSaveOnline();
 
 private:
-    std::string dbHost; //
+    std::string dbHost = "C:/Users/andre/Documents/GitHub/TUIVSS/TestPc/TestPc/";
     std::string dbHostOnline = "C:/Users/andre/OneDrive/Universitet/2 Semester/Projekt2";
 
     // Function to encrypt/decrypt the data

@@ -49,7 +49,6 @@ public:
 private:
     int amountOfRooms;
     int amountOfUsers;
-    unsigned int amountToSend;
     // User user;
     User *userPtr;
     SerialPort *arduino;

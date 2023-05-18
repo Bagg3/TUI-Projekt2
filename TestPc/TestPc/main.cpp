@@ -5,7 +5,6 @@
 
 #define portName "\\\\.\\COM3"
 
-// CHANGE CHANGELOG TO VALIDATE INPUT
 int main()
 {
 	// Setting up objects and dependcies
@@ -14,12 +13,16 @@ int main()
 	SerialPort arduino(portName);
 
 	PCHandler PC(&admin, &arduino, &db);
+
 	admin.clearScreen();
+
+	// Start the program
 	PC.showMenu();
 
 	return 0;
 }
 
+// Can be used to turn off echo in console
 /*
 # include<windows.h>
 HANDLE console = GetStdHandle(STD_INPUT_HANDLE);

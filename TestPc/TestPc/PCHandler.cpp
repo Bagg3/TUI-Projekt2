@@ -29,8 +29,6 @@ PCHandler::PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase)
     // Setting the amount of rooms and users from database
     amountOfRooms = std::stoi(db->findData("rooms.txt", false));
     amountOfUsers = std::stoi(db->findData("users.txt", false));
-
-    amountToSend = 0;
 }
 
 void PCHandler::showMenu()
@@ -96,6 +94,7 @@ void PCHandler::showMenu()
             if (running)
                 userPtr->clearScreen();
         }
+        arduino->~SerialPort();
     }
 }
 
@@ -264,7 +263,7 @@ std::vector<std::string> PCHandler::getLog(bool connect)
     // If the variable connect is true, the function will try to connect to the arduino
     if (connect)
     {
-        amountToSend = 2;
+
         sendData(logRequest);
 
         // If the arduino is not connected, it will try to connect
@@ -407,7 +406,7 @@ void PCHandler::setRooms()
             std::cout << "Invalid choice. Please choose again." << std::endl;
         }
     }
-
+    // Saves the data in the database
     db->saveData("rooms.txt", std::to_string(amountOfRooms), false);
 }
 
@@ -429,40 +428,37 @@ void PCHandler::setUsers()
             std::cout << "Invalid choice. Please choose again." << std::endl;
         }
     }
+    // Saves the data in the database
     db->saveData("users.txt", std::to_string(amountOfRooms), false);
 }
 
 void PCHandler::sendData(const char *sendString)
 {
-
+    // If the arduino is not connected, it will be connected
     if (!arduino->isConnected())
     {
         arduino = new SerialPort(portName);
     }
 
+    // If the arduino is connected, the data will be sent
     if (arduino->isConnected())
     {
         bool hasWritten = arduino->writeSerialPort(sendString, DATA_LENGTH);
         if (hasWritten)
         {
             std::cout << "Data written successfully." << std::endl;
-            amountToSend--;
         }
         else
         {
             std::cout << "Data was not written." << std::endl;
         }
     }
-    if (amountToSend == 0)
-    {
-        arduino->~SerialPort(); // Destructor
-    }
 }
 
 void PCHandler::calibrateSystem()
 {
-
-    sendData(calibrateRequest);
+    // Uses the sendData function to send the calibration request to the arduino
+    sendData(calibrateRequest); // Calibrate request is a const char* defined in the header file
     std::cout << "Calibrating system done" << std::endl;
     nextMenu(); // Next menu function doesnt work on const function
 }
@@ -504,6 +500,7 @@ void PCHandler::selectRoomConnection()
     bool validChoice = false;
     std::string roomConnections;
 
+    // Asks the user to input the room number and the rooms it is connected to
     while (!validChoice)
     {
         std::cout << std::endl
@@ -532,6 +529,7 @@ void PCHandler::selectRoomConnection()
         }
     }
 
+    // Sends the data to the arduino
     std::string data = "C," + std::to_string(roomNumber) + "," + roomConnections;
     sendData(data.c_str());
     nextMenu();
@@ -544,6 +542,7 @@ void PCHandler::changeLog()
     int roomNumber;
     bool goBack = false;
 
+    // Asks the user to input the person number and the room number
     while (!goBack)
     {
         bool validChoice = true;
@@ -588,12 +587,14 @@ void PCHandler::changeLog()
         }
     }
 
+    // Sends the data to the log file
     updateLog(log);
     nextMenu();
 }
 
 void PCHandler::nextMenu()
 {
+    // Waits for the user to press a key before continuing
     std::cout << std::endl
               << "Press any key to continue..." << std::endl;
     _getch();
@@ -602,8 +603,9 @@ void PCHandler::nextMenu()
 std::vector<int> PCHandler::formatLog(bool connect)
 {
     std::vector<std::string> data = getLog(connect);
-    std::vector<int> log; // Vector to store the highest room numbers
+    std::vector<int> log; // Vector to store the room numbers with highest probability
 
+    // If the data is not connected to the arduino, the data is already formatted 256 is max value
     if (data[0].length() < 4)
     {
         for (const std::string &line : data)
@@ -614,28 +616,32 @@ std::vector<int> PCHandler::formatLog(bool connect)
     }
     else
     {
+        // If the data is connected to the arduino, the data is formatted as "roomNumber:probability"
         for (int j = 0; j < data.size(); j++)
         {
 
-            data[j].push_back(' ');
+            data[j].push_back(' '); // Add a space at the end of the string to make it so the last number is also added to the array
 
             // Function to convert example to int array, split on " "
-            std::string delimiter = " ";
-            size_t pos = 0;
-            std::string token;
+            std::string delimiter = " "; // Define the delimiter
+            size_t pos = 0;              // Initialize the position variable for finding the delimiter
+            std::string token;           // Initialize a string variable to store the extracted token
             int i = 0;
-            int arr[10];
+            int arr[10]; // Declare an integer array to store the converted values
+
+            // Loop through the string to extract tokens delimited by a space
             while ((pos = data[j].find(delimiter)) != std::string::npos)
             {
-                token = data[j].substr(0, pos);
-                arr[i] = std::stoi(token);
-                data[j].erase(0, pos + delimiter.length());
+                token = data[j].substr(0, pos);             // Extract the token from the beginning to the delimiter position
+                arr[i] = std::stoi(token);                  // Convert the token to an integer and store it in the array
+                data[j].erase(0, pos + delimiter.length()); // Remove the extracted token and the delimiter from the string
                 i++;
             }
 
             // Find the highest value in the array
             int highest = 0;
             int highestRoom = 0;
+            // Loop through the array to find the highest value
             for (int k = 0; k < amountOfRooms; k++)
             {
                 if (arr[k] > highest)
@@ -662,12 +668,12 @@ void PCHandler::updateLog(std::vector<int> log)
         logString += std::to_string(log[i]);
         logString += " ";
     }
-
+    // Save the log to the log file
     db->saveData("log.txt", logString, false);
 }
 
 void PCHandler::printSystemInfo()
-{
+{ // Prints the system information
     std::cout << "System information: " << std::endl;
     std::cout << "Amount of rooms: " << amountOfRooms << std::endl;
     std::cout << "Amount of users: " << amountOfUsers << std::endl;
@@ -679,7 +685,7 @@ void PCHandler::printSystemInfo()
 
 void PCHandler::checkIfInitialised()
 {
-
+    // Checks if the system is initialised by checking if the amount of rooms and users is not 0
     if (db->findData("rooms.txt", true) != "" || db->findData("users.txt", true) != "")
     {
         amountOfRooms = std::stoi(db->findData("rooms.txt", false));
@@ -706,10 +712,10 @@ void PCHandler::initialiseSystem()
     int amountOfSlaves;
     std::cout << "Initialising system..." << std::endl;
 
+    // Sets the amount of rooms and users
     setRooms();
     setUsers();
 
-    amountToSend++;
     std::string data = "E," + std::to_string(amountOfRooms) + "," + std::to_string(amountOfUsers) + "\0";
 
     sendData(data.c_str());
@@ -718,7 +724,6 @@ void PCHandler::initialiseSystem()
 
     std::cout << "Define how many slaves you want to set: " << std::endl;
     std::cin >> amountOfSlaves;
-    amountToSend = amountOfSlaves - 1;
 
     for (int i = 0; i < amountOfSlaves; i++)
     {
@@ -729,22 +734,23 @@ void PCHandler::initialiseSystem()
 
 void PCHandler::selectSaveOnline()
 {
+    // Prints the current save online setting and asks the user if they want to change it
     std::cout << "Currently the data";
     if (db->getSaveOnline() == true)
-    {
         std::cout << " is";
-    }
+
     else
-    {
         std::cout << " is not";
-    }
+
     std::cout << "saved online." << std::endl;
-    std::cout << "Do you want to save the data online?" << std::endl;
+    std::cout << "Do you want to save the data online?" << std::endl
+              << std::endl;
     std::cout << "1. Yes" << std::endl;
     std::cout << "2. No" << std::endl;
     int choice;
     std::cin >> choice;
 
+    // If the user wants to save the data online, the setting is changed to true
     if (choice == 1)
     {
         db->setSaveOnline(true);

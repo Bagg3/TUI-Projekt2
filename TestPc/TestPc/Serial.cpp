@@ -26,7 +26,7 @@ SerialPort::SerialPort(const char *portName)
         }
         else
         {
-            // std::cerr << "ERROR!!!\n";
+            std::cerr << "ERROR!!!\n";
         }
     }
     else
