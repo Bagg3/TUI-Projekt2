@@ -9,11 +9,12 @@
 
 /*
 PROTOCOL TO MASTER
-A = Send log from master
-B = New slave
-C = Room connections
-D = Calibrate system
-E = Initialise system
+A,LOG = Send log from master
+B,Adress,Type/Connection = New slave
+C,Room,RoomConnections = Room connections
+D,CAL = Calibrate system
+E,ROOM,USERS,
+SLAVES = Initialise system
 */
 
 class SerialPort

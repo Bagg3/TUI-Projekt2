@@ -9,7 +9,7 @@
 // const char* portName = "\\\\.\\COM3";
 SerialPort *arduino;
 std::string receivedData;
-
+/*
 PCHandler::PCHandler(std::string password)
 {
     User admin(password);
@@ -17,26 +17,36 @@ PCHandler::PCHandler(std::string password)
     amountOfRooms = 10;
     amountOfUsers = 10;
 }
+*/
 
 PCHandler::PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase)
 {
+    // Setting up objects and dependcies
     userPtr = admin;
     this->arduino = arduino;
     db = dataBase;
+
+    // Setting the amount of rooms and users from database
+    amountOfRooms = std::stoi(db->findData("rooms.txt", false));
+    amountOfUsers = std::stoi(db->findData("users.txt", false));
+
+    amountToSend = 0;
 }
 
 void PCHandler::showMenu()
 {
-    bool running = true;
+    bool running = true; // Used to turn off the program
     while (running)
     {
         int choice = 0;
 
-        user.login();
+        // Login function
+        userPtr->login();
 
+        // Checks to see if the system has been initialised
         checkIfInitialised();
 
-        while (user.isLoggedIn())
+        while (userPtr->isLoggedIn())
         {
             userPtr->clearScreen();
             // Print the menu
@@ -70,11 +80,11 @@ void PCHandler::showMenu()
                 userPtr->changePassword();
                 break;
             case 6:
-                user.logout();
+                userPtr->logout();
                 break;
             case 7:;
                 running = false;
-                user.logout();
+                userPtr->logout();
                 break;
             default:
                 std::cout << "Invalid choice. Please choose again." << std::endl;
@@ -111,14 +121,19 @@ void PCHandler::printData()
         switch (choice)
         {
         case 1:
+            userPtr->clearScreen();
+            std::cout << "Fechting data from..." << std::endl;
             log = formatLog();
             printLog(log);
             nextMenu();
             break;
         case 2:
+            userPtr->clearScreen();
+            std::cout << "Fechting data from..." << std::endl;
             printRawData();
             break;
         case 3:
+            userPtr->clearScreen();
             printSystemInfo();
             break;
         case 4:
@@ -147,24 +162,30 @@ void PCHandler::changeSystem()
         std::cout << "1. Add a new slave" << std::endl;
         std::cout << "2. Select room connection" << std::endl;
         std::cout << "3. Calibrate the system" << std::endl;
-        std::cout << "4. Change name of rooms or persons" << std::endl;
-        std::cout << "5. Go Back" << std::endl;
+        // std::cout << "4. Change name of rooms or persons" << std::endl;
+        std::cout << "4. Select save online" << std::endl;
+        std::cout << "5. Go Back" << std::endl
+                  << std::endl;
 
         std::cin >> choice;
 
         switch (choice)
         {
         case 1:
+            userPtr->clearScreen();
             addSlave();
             break;
         case 2:
+            userPtr->clearScreen();
             selectRoomConnection();
             break;
         case 3:
+            userPtr->clearScreen();
             calibrateSystem();
             break;
         case 4:
-            // Change name of rooms or persons
+            userPtr->clearScreen();
+            selectSaveOnline();
             break;
         case 5:
             goBack = true;
@@ -187,12 +208,11 @@ void PCHandler::addSlave()
     int slaveAdress;
     int roomNumber;
 
-    // Makes sure the user inputs a valid binary number
+    // Makes sure the user inputs a valid number
     while (!validChoice)
     {
         std::cout << "Input the slave address in a valid whole number in the interval 1-255: " << std::endl;
         std::cin >> slaveAdress;
-
         if (slaveAdress >= 1 && slaveAdress <= 255)
         {
             std::cout << "You chose to change the slave adress to " << slaveAdress << std::endl;
@@ -213,6 +233,7 @@ void PCHandler::addSlave()
         std::cout << "If the slave works with an ID-Sensor format it as 'X00X', where X is the room" << std::endl;
 
         std::cin >> roomNumber;
+        // Valid room numbers are 1-256256 because of 256 256 is the highest combination
         if (roomNumber >= 1 && roomNumber <= 256256)
         {
             std::cout << "You chose to change the number of slaves to " << roomNumber << std::endl;
@@ -226,51 +247,76 @@ void PCHandler::addSlave()
     }
 
     // Convert the slave adress and room number to a string
-    std::string slaveAdressToSend = "B," + std::to_string(slaveAdress) + "," + std::to_string(roomNumber);
+    std::string slaveAdressToSend = "B," + std::to_string(slaveAdress) + "," + std::to_string(roomNumber) + "\0";
     std::cout << "Slave adress and room number: " << slaveAdressToSend << std::endl;
 
-    const char *slaveAdressChar = slaveAdressToSend.c_str();
-    sendData(slaveAdressChar);
+    // Converts the string to a char array and sends it to the arduino
+    sendData(slaveAdressToSend.c_str());
 
     nextMenu();
 }
 
-std::vector<std::string> PCHandler::getLog()
+std::vector<std::string> PCHandler::getLog(bool connect)
 {
     std::vector<std::string> data;
+    bool hasBeenConnected = false; // Checks if the arduino has been connected before
 
-    arduino = new SerialPort(portName);
-    arduino->isConnected();
-    std::cout << "Is connected: " << arduino->isConnected() << std::endl;
-
-    bool hasBeenConnected = false;
-    if (arduino->isConnected())
+    // If the variable connect is true, the function will try to connect to the arduino
+    if (connect)
     {
-        hasBeenConnected = true;
-    }
+        amountToSend = 2;
+        sendData(logRequest);
 
-    while (arduino->isConnected())
-    {
-        char receivedChar;
-        int hasRead = arduino->readSerialPort(&receivedChar, 1);
-        if (hasRead)
+        // If the arduino is not connected, it will try to connect
+        if (!arduino->isConnected())
         {
-            if (receivedChar != '\n')
+            arduino = new SerialPort(portName);
+        }
+
+        std::cout << "Is connected: " << arduino->isConnected() << std::endl;
+
+        if (arduino->isConnected())
+        {
+            hasBeenConnected = true; // Sets the variable to true
+
+            // Sets up the variables for the while loop
+            char receivedChar[DATA_LENGTH];
+            std::string receivedData;
+
+            while (arduino->isConnected())
             {
-                receivedData += receivedChar;
-            }
-            else
-            {
-                data.push_back(receivedData);
-                receivedData.clear();
+                // Reads the serial port and saves the data in the variables
+                int hasRead = arduino->readSerialPort(receivedChar, DATA_LENGTH);
+
+                // If the data is not empty, it will be saved in the vector, sort on "\n"
+                if (hasRead > 0)
+                {
+                    for (int i = 0; i < hasRead; i++)
+                    {
+                        if (receivedChar[i] != '\n')
+                        {
+                            receivedData += receivedChar[i];
+                        }
+                        else
+                        {
+                            data.push_back(receivedData);
+                            receivedData.clear();
+                        }
+                    }
+                }
+                // Once the desired amount of data has been received, the serial port will be closed
+                if (data.size() == amountOfUsers || !arduino->isConnected())
+                {
+                    std::cout << "Tried to close serial" << std::endl;
+                    arduino->closeSerial();
+                }
             }
         }
-        if (data.size() == amountOfUsers || !arduino->isConnected())
-        {
-            arduino->closeSerial();
-        }
+
+        std::cout << "Has been connected: " << hasBeenConnected << std::endl;
     }
 
+    // If the arduino has not been connected, the data will be read from the log file
     if (!hasBeenConnected)
     {
         std::string log;
@@ -285,36 +331,41 @@ std::vector<std::string> PCHandler::getLog()
         }
     }
 
-    /*
-        std::string string1 = "10 20 40 30 0 0 0 0 0 0";
-        std::string string2 = "20 10 30 20 10 0 0 0 0 0";
-        std::string string3 = "30 0 20 10 10 10 10 0 0 0";
-        std::string string4 = "40 10 20 10 10 0 0 0 0 0";
-        std::string string5 = "0 40 10 20 10 10 0 0 0 0";
-        std::string string6 = "0 0 40 10 20 10 10 0 0 0";
-        std::string string7 = "0 0 0 0 10 20 70 0 0 0";
-        std::string string8 = "0 0 0 0 40 10 20 10 10 0";
-        std::string string9 = "0 0 0 0 0 40 10 20 10 0";
-        std::string string10 = "0 0 40 0 0 0 30 20 10 0";
-
-        data.push_back(string1);
-        data.push_back(string2);
-        data.push_back(string3);
-        data.push_back(string4);
-        data.push_back(string5);
-        data.push_back(string6);
-        data.push_back(string7);
-        data.push_back(string8);
-        data.push_back(string9);
-        data.push_back(string10);
-
-    */
     return data;
 }
 
-void PCHandler::printLog(std::vector<int> log)
+/*
+    std::string string1 = "10 20 40 30 0 0 0 0 0 0";
+    std::string string2 = "20 10 30 20 10 0 0 0 0 0";
+    std::string string3 = "30 0 20 10 10 10 10 0 0 0";
+    std::string string4 = "40 10 20 10 10 0 0 0 0 0";
+    std::string string5 = "0 40 10 20 10 10 0 0 0 0";
+    std::string string6 = "0 0 40 10 20 10 10 0 0 0";
+    std::string string7 = "0 0 0 0 10 20 70 0 0 0";
+    std::string string8 = "0 0 0 0 40 10 20 10 10 0";
+    std::string string9 = "0 0 0 0 0 40 10 20 10 0";
+    std::string string10 = "0 0 40 0 0 0 30 20 10 0";
+
+    data.push_back(string1);
+    data.push_back(string2);
+    data.push_back(string3);
+    data.push_back(string4);
+    data.push_back(string5);
+    data.push_back(string6);
+    data.push_back(string7);
+    data.push_back(string8);
+    data.push_back(string9);
+    data.push_back(string10);
+
+
+return data;
+}
+*/
+void PCHandler::printLog(std::vector<int> log, bool clrScreen)
 {
-    userPtr->clearScreen();
+
+    if (clrScreen)
+        userPtr->clearScreen();
 
     // Print the highest room number for the person
     for (int i = 0; i < log.size(); i++)
@@ -327,6 +378,9 @@ void PCHandler::printRawData()
 {
     std::vector<std::string> data = getLog();
 
+    userPtr->clearScreen();
+
+    // Prints the raw data from the log
     for (int i = 0; i < data.size(); i++)
     {
         std::cout << data[i] << std::endl;
@@ -408,30 +462,8 @@ void PCHandler::sendData(const char *sendString)
 void PCHandler::calibrateSystem()
 {
 
-    const char *sendString = "D,init";
-
-    sendData(sendString);
-
-    /* MIGHT BE UNNECESSARY IF sendDATA WORKS
-        arduino = new SerialPort(portName);
-
-        arduino->isConnected();
-
-        if (arduino->isConnected())
-        {
-            bool hasWritten = arduino->writeSerialPort(sendString, DATA_LENGTH);
-            if (hasWritten)
-            {
-                std::cout << "Data written successfully." << std::endl;
-            }
-            else
-            {
-                std::cout << "Data was not written." << std::endl;
-            }
-        }
-
-        arduino->~SerialPort(); // Destructor
-        */
+    sendData(calibrateRequest);
+    std::cout << "Calibrating system done" << std::endl;
     nextMenu(); // Next menu function doesnt work on const function
 }
 
@@ -507,13 +539,14 @@ void PCHandler::selectRoomConnection()
 
 void PCHandler::changeLog()
 {
-
-    std::vector<int> log = formatLog();
+    std::vector<int> log = formatLog(false);
     int personNumber;
     int roomNumber;
     bool goBack = false;
+
     while (!goBack)
     {
+        bool validChoice = true;
         userPtr->clearScreen();
         printLog(log);
         std::cout << std::endl
@@ -527,24 +560,30 @@ void PCHandler::changeLog()
             goBack = true;
             break;
         }
-        /* if (personNumber >= 1 && personNumber <= amountOfUsers)
-         {
-             std::cout << "Select the room number you want to change to: " << std::endl;
-         }
-         */
-
-        std::cout << std::endl
-                  << "Select the room number you want to change to, valid rooms are 1-" << amountOfRooms << ":" << std::endl;
-        std::cin >> roomNumber;
-
-        if (roomNumber == 0)
+        else if (personNumber < 0 || personNumber > amountOfUsers)
         {
-            goBack = true;
-            break;
+            std::cout << "Invalid person number. Please try again." << std::endl;
+            validChoice = false;
+            continue;
         }
 
-        if (personNumber != 0 || roomNumber != 0)
+        if (validChoice)
         {
+            std::cout << std::endl
+                      << "Select the room number you want to change to, valid rooms are 1-" << amountOfRooms << ":" << std::endl;
+            std::cin >> roomNumber;
+
+            if (roomNumber == 0)
+            {
+                goBack = true;
+                break;
+            }
+            else if (roomNumber < 1 || roomNumber > amountOfRooms)
+            {
+                std::cout << "Invalid room number. Please try again." << std::endl;
+                continue;
+            }
+
             log[personNumber - 1] = roomNumber;
         }
     }
@@ -560,12 +599,12 @@ void PCHandler::nextMenu()
     _getch();
 }
 
-std::vector<int> PCHandler::formatLog()
+std::vector<int> PCHandler::formatLog(bool connect)
 {
-    std::vector<std::string> data = getLog();
+    std::vector<std::string> data = getLog(connect);
     std::vector<int> log; // Vector to store the highest room numbers
 
-    if (data[0].length() < 2)
+    if (data[0].length() < 4)
     {
         for (const std::string &line : data)
         {
@@ -633,19 +672,21 @@ void PCHandler::printSystemInfo()
     std::cout << "Amount of rooms: " << amountOfRooms << std::endl;
     std::cout << "Amount of users: " << amountOfUsers << std::endl;
     std::cout << "Current Log: " << std::endl;
-    std::vector<int> log = formatLog();
-    printLog(log);
+    std::vector<int> log = formatLog(false);
+    printLog(log, false);
     nextMenu();
 }
 
 void PCHandler::checkIfInitialised()
 {
+
     if (db->findData("rooms.txt", true) != "" || db->findData("users.txt", true) != "")
     {
         amountOfRooms = std::stoi(db->findData("rooms.txt", false));
         amountOfUsers = std::stoi(db->findData("users.txt", false));
     }
     else
+
     {
         std::cout << "Do you wan to initialise the system?" << std::endl;
         std::cout << "1. Yes" << std::endl;
@@ -669,8 +710,11 @@ void PCHandler::initialiseSystem()
     setUsers();
 
     amountToSend++;
-    std::string data = "E," + std::to_string(amountOfRooms) + "," + std::to_string(amountOfUsers);
+    std::string data = "E," + std::to_string(amountOfRooms) + "," + std::to_string(amountOfUsers) + "\0";
+
     sendData(data.c_str());
+
+    //   userPtr->clearScreen();
 
     std::cout << "Define how many slaves you want to set: " << std::endl;
     std::cin >> amountOfSlaves;
@@ -681,4 +725,34 @@ void PCHandler::initialiseSystem()
         addSlave();
     }
     nextMenu();
+}
+
+void PCHandler::selectSaveOnline()
+{
+    std::cout << "Currently the data";
+    if (db->getSaveOnline() == true)
+    {
+        std::cout << " is";
+    }
+    else
+    {
+        std::cout << " is not";
+    }
+    std::cout << "saved online." << std::endl;
+    std::cout << "Do you want to save the data online?" << std::endl;
+    std::cout << "1. Yes" << std::endl;
+    std::cout << "2. No" << std::endl;
+    int choice;
+    std::cin >> choice;
+
+    if (choice == 1)
+    {
+        db->setSaveOnline(true);
+        db->saveData("saveSettings.txt", "true", false);
+    }
+    else
+    {
+        db->setSaveOnline(true);
+        db->saveData("saveSettings.txt", "false", false);
+    }
 }

@@ -143,6 +143,9 @@
     <Text Include="db.txt" />
     <Text Include="key.txt" />
     <Text Include="log.txt" />
+    <Text Include="rooms.txt" />
+    <Text Include="saveSettings.txt" />
+    <Text Include="users.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

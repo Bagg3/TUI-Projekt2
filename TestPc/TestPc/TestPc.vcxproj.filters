@@ -46,8 +46,23 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="key.txt" />
-    <Text Include="db.txt" />
-    <Text Include="log.txt" />
+    <Text Include="db.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="key.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="log.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="rooms.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="saveSettings.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="users.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

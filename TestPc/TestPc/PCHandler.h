@@ -10,16 +10,16 @@
 class PCHandler
 {
 public:
-    PCHandler(std::string password = "admin");
+    // PCHandler(std::string password = "admin");
     PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase);
 
     void showMenu();
 
     void printData();
 
-    std::vector<std::string> getLog();
-    std::vector<int> formatLog();
-    void printLog(std::vector<int> log);
+    std::vector<std::string> getLog(bool connect = true);
+    std::vector<int> formatLog(bool connect = true);
+    void printLog(std::vector<int> log, bool clrScreen = true);
     void printRawData();
     void printSystemInfo();
 
@@ -28,6 +28,7 @@ public:
     void setRooms();
     void setUsers();
     void selectRoomConnection();
+    void selectSaveOnline();
 
     void calibrateSystem();
 
@@ -48,12 +49,15 @@ public:
 private:
     int amountOfRooms;
     int amountOfUsers;
-    int amountToSend;
-    User user;
+    unsigned int amountToSend;
+    // User user;
     User *userPtr;
     SerialPort *arduino;
     dbHandler *db;
     const char *portName = "\\\\.\\COM3";
+
+    const char *logRequest = "A,LOG\0";
+    const char *calibrateRequest = "D,CAL\0";
 };
 
 #endif

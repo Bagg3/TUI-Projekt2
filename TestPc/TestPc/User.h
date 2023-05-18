@@ -17,7 +17,6 @@ public:
 	User();
 	User(dbHandler dataBase, std::string password = "admin");
 
-
 	// Function to login to the system, checks if the username and password are correct, Return if the login is true og not
 	void login();
 

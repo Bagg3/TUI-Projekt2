@@ -10,7 +10,7 @@ int main()
 {
 	// Setting up objects and dependcies
 	dbHandler db;
-	User admin(db);
+	User admin(db, "admin");
 	SerialPort arduino(portName);
 
 	PCHandler PC(&admin, &arduino, &db);

@@ -7,7 +7,7 @@
 dbHandler::dbHandler(std::string dbHost)
 {
 	dbHost = dbHost;
-	if (findData("saveOnline.txt", false) == "true")
+	if (findData("saveSettings.txt", false) == "true")
 	{
 		bool saveOnline = true;
 	}
@@ -31,19 +31,22 @@ std::string dbHandler::xorCipher(std::string data, char key)
 // Decrypt data from file, using key from key.txt, where fileAdress is the name of the file in UserDB folder
 std::string dbHandler::findData(const std::string &fileAdress, bool decrypt)
 {
-	std::ifstream file(dbHost + fileAdress);
-	if (!file.is_open())
-	{
-		throw std::runtime_error("Unable to open file");
-	}
-
 	std::string data;
-	std::string line;
-	while (getline(file, line))
+	std::ifstream file;
+	file.open(dbHost + fileAdress);
+	if (file.is_open())
 	{
-		data += line;
+		std::string line;
+		while (getline(file, line))
+		{
+			data += line;
+		}
+		file.close();
 	}
-	file.close();
+	else
+	{
+		std::cout << "Unable to open file";
+	}
 
 	if (!decrypt)
 	{
@@ -128,4 +131,19 @@ void dbHandler::saveCipheredDataToFile(const std::string &fileAdress, const std:
 	{
 		throw std::runtime_error("Unable to open file");
 	}
+}
+
+void dbHandler::setSaveOnline(bool save)
+{
+	saveOnline = save;
+	if (saveOnline)
+		saveData("saveSettings.txt", "true", false);
+
+	else
+		saveData("saveSettings.txt", "false", false);
+}
+
+bool dbHandler::getSaveOnline()
+{
+	return saveOnline;
 }
