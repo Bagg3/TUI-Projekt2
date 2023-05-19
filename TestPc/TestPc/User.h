@@ -4,6 +4,7 @@
 
 #include <string>
 #include "dbHandler.h"
+#include <windows.h>
 
 class User
 {
@@ -30,7 +31,12 @@ public:
 	void changePassword();
 
 	// Function to clear the terminal
-	void clearScreen() const;
+	void clearScreen();
+
+	int getWindowWidth();
+	void setConsoleColor(WORD attributes);
+	void printHorizontalLine(int width, WORD attributes);
+	void printCenteredText(const std::string &text, int padding, WORD attributes);
 };
 
 #endif
