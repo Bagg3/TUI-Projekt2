@@ -147,3 +147,11 @@ bool dbHandler::getSaveOnline()
 {
 	return saveOnline;
 }
+
+bool dbHandler::getSaveData()
+{
+	if (findData("saveSettings.txt", false) == "true")
+		return true;
+	else
+		return false;
+}

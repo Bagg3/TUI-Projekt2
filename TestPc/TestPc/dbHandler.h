@@ -19,10 +19,11 @@ public:
     void setSaveOnline(bool save);
 
     bool getSaveOnline();
+    bool getSaveData();
 
 private:
     std::string dbHost = "C:/Users/andre/Documents/GitHub/TUIVSS/TestPc/TestPc/";
-    std::string dbHostOnline = "C:/Users/andre/OneDrive/Universitet/2 Semester/Projekt2";
+    std::string dbHostOnline = "C:/Users/andre/OneDrive/Universitet/2 Semester/Projekt2/";
 
     // Function to encrypt/decrypt the data
     std::string xorCipher(std::string data, char key);

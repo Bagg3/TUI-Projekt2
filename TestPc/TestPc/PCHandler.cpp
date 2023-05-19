@@ -29,6 +29,7 @@ PCHandler::PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase)
     // Setting the amount of rooms and users from database
     amountOfRooms = std::stoi(db->findData("rooms.txt", false));
     amountOfUsers = std::stoi(db->findData("users.txt", false));
+    db->setSaveOnline(db->getSaveData());
 }
 
 void PCHandler::showMenu()
@@ -459,7 +460,25 @@ void PCHandler::calibrateSystem()
 {
     // Uses the sendData function to send the calibration request to the arduino
     sendData(calibrateRequest); // Calibrate request is a const char* defined in the header file
-    std::cout << "Calibrating system done" << std::endl;
+    std::string receivedData;
+    char receivedChar[DATA_LENGTH];
+    int hasRead = arduino->readSerialPort(receivedChar, DATA_LENGTH);
+    // If the data is not empty, it will be saved in a string
+    if (hasRead > 0)
+    {
+        for (int i = 0; i < hasRead; i++)
+        {
+            if (receivedChar[i] != '\n')
+            {
+                receivedData += receivedChar[i];
+            }
+        }
+    }
+
+    if (hasRead)
+        std::cout << "Received Char: " << receivedChar << std::endl;
+
+    std::cout << "Received data: " << receivedData << std::endl;
     nextMenu(); // Next menu function doesnt work on const function
 }
 
@@ -742,7 +761,7 @@ void PCHandler::selectSaveOnline()
     else
         std::cout << " is not";
 
-    std::cout << "saved online." << std::endl;
+    std::cout << " saved online." << std::endl;
     std::cout << "Do you want to save the data online?" << std::endl
               << std::endl;
     std::cout << "1. Yes" << std::endl;
