@@ -24,6 +24,20 @@ User::User(dbHandler dataBase, std::string password)
 	isLoggedIn_ = false;
 }
 
+void User::validate(std::string password)
+{
+
+	if (password == password_)
+	{
+		std::cout << "Login successful" << std::endl;
+		isLoggedIn_ = true;
+	}
+	else
+	{
+		std::cout << "Login failed try again" << std::endl;
+	}
+}
+
 void User::login()
 {
 	// Checks if the user is logged in, if not, then it will ask for a password adn check if it is correct
@@ -34,16 +48,7 @@ void User::login()
 		std::cout << "Login to the system" << std::endl;
 		std::cout << "Password: ";
 		std::cin >> password;
-
-		if (password == password_)
-		{
-			std::cout << "Login successful" << std::endl;
-			isLoggedIn_ = true;
-		}
-		else
-		{
-			std::cout << "Login failed try again" << std::endl;
-		}
+		validate(password);
 		/*
 				// Used to bypass the database
 				if (password == "admin")

@@ -13,6 +13,8 @@ public:
     // PCHandler(std::string password = "admin");
     PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase);
 
+    void checkIfInitialised();
+
     void showMenu();
 
     void printData();
@@ -23,7 +25,7 @@ public:
     void printRawData();
     void printSystemInfo();
 
-    void changeSystem();
+    void showChangeOptions();
     void addSlave();
     void setRooms();
     void setUsers();
@@ -32,23 +34,21 @@ public:
 
     void calibrateSystem();
 
-    void sendData(const char *sendString);
-
     void initialiseSystem();
 
     void changeLog();
-
-    void nextMenu();
-
-    bool isValidRoom(const std::string &input);
-
     void updateLog(std::vector<int> log);
 
-    void checkIfInitialised();
+    void exit();
+
+    void nextMenu();
+    bool isValidRoom(const std::string &input);
+    void sendData(const char *sendString);
 
 private:
     int amountOfRooms;
     int amountOfUsers;
+    bool running;
     // User user;
     User *userPtr;
     SerialPort *arduino;

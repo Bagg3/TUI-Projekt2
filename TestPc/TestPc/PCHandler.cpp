@@ -7,7 +7,7 @@
 
 #define DATA_LENGTH 255
 // const char* portName = "\\\\.\\COM3";
-SerialPort* arduino;
+SerialPort *arduino;
 std::string receivedData;
 /*
 PCHandler::PCHandler(std::string password)
@@ -19,7 +19,7 @@ PCHandler::PCHandler(std::string password)
 }
 */
 
-PCHandler::PCHandler(User* admin, SerialPort* arduino, dbHandler* dataBase)
+PCHandler::PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase)
 {
 	// Setting up objects and dependcies
 	userPtr = admin;
@@ -34,7 +34,7 @@ PCHandler::PCHandler(User* admin, SerialPort* arduino, dbHandler* dataBase)
 
 void PCHandler::showMenu()
 {
-	bool running = true; // Used to turn off the program
+	running = true; // Used to turn off the program
 	while (running)
 	{
 		int choice = 0;
@@ -57,7 +57,7 @@ void PCHandler::showMenu()
 			std::cout << "5. Change Password" << std::endl;
 			std::cout << "6. Log out" << std::endl;
 			std::cout << "7. Exit" << std::endl
-				<< std::endl;
+					  << std::endl;
 
 			std::cin >> choice;
 
@@ -67,7 +67,7 @@ void PCHandler::showMenu()
 				printData();
 				break;
 			case 2:
-				changeSystem();
+				showChangeOptions();
 				break;
 			case 3:
 				initialiseSystem();
@@ -82,8 +82,7 @@ void PCHandler::showMenu()
 				userPtr->logout();
 				break;
 			case 7:;
-				running = false;
-				userPtr->logout();
+				exit();
 				break;
 			default:
 				std::cout << "Invalid choice. Please choose again." << std::endl;
@@ -114,7 +113,7 @@ void PCHandler::printData()
 		std::cout << "2. Print Raw Data" << std::endl;
 		std::cout << "3. Print System Info" << std::endl;
 		std::cout << "4. Go Back" << std::endl
-			<< std::endl;
+				  << std::endl;
 
 		std::cin >> choice;
 
@@ -148,7 +147,7 @@ void PCHandler::printData()
 	}
 }
 
-void PCHandler::changeSystem()
+void PCHandler::showChangeOptions()
 {
 
 	int choice = 0;
@@ -165,7 +164,7 @@ void PCHandler::changeSystem()
 		// std::cout << "4. Change name of rooms or persons" << std::endl;
 		std::cout << "4. Select save online" << std::endl;
 		std::cout << "5. Go Back" << std::endl
-			<< std::endl;
+				  << std::endl;
 
 		std::cin >> choice;
 
@@ -228,7 +227,7 @@ void PCHandler::addSlave()
 	while (!validChoice)
 	{
 		std::cout << std::endl
-			<< "Input the room number, valid room are 1-" << amountOfRooms << ":" << std::endl;
+				  << "Input the room number, valid room are 1-" << amountOfRooms << ":" << std::endl;
 		std::cout << "If the slave is between rooms format it as 'X00N', where X and N are the two rooms" << std::endl;
 		std::cout << "If the slave works with an ID-Sensor format it as 'X00X', where X is the room" << std::endl;
 
@@ -433,7 +432,7 @@ void PCHandler::setUsers()
 	db->saveData("users.txt", std::to_string(amountOfUsers), false);
 }
 
-void PCHandler::sendData(const char* sendString)
+void PCHandler::sendData(const char *sendString)
 {
 	// If the arduino is not connected, it will be connected
 	if (!arduino->isConnected())
@@ -497,11 +496,11 @@ void PCHandler::calibrateSystem()
 	nextMenu(); // Next menu function doesnt work on const function
 }
 
-bool PCHandler::isValidRoom(const std::string& input)
+bool PCHandler::isValidRoom(const std::string &input)
 {
 
 	std::stringstream ss(input); // Create a stringstream to extract values separated by commas
-	std::string segment;         // Store each segment between commas
+	std::string segment;		 // Store each segment between commas
 
 	while (std::getline(ss, segment, ',')) // Extract segments between commas
 	{
@@ -510,11 +509,11 @@ bool PCHandler::isValidRoom(const std::string& input)
 		{
 			roomValue = std::stoi(segment); // Convert the segment to an integer
 		}
-		catch (const std::invalid_argument& e)
+		catch (const std::invalid_argument &e)
 		{
 			return false; // The segment couldn't be converted to an integer
 		}
-		catch (const std::out_of_range& e)
+		catch (const std::out_of_range &e)
 		{
 			return false; // The segment is out of the valid range for an integer
 		}
@@ -538,7 +537,7 @@ void PCHandler::selectRoomConnection()
 	while (!validChoice)
 	{
 		std::cout << std::endl
-			<< "Input the room number 1 to " << amountOfRooms << ": " << std::endl;
+				  << "Input the room number 1 to " << amountOfRooms << ": " << std::endl;
 		std::cin >> roomNumber;
 		if (roomNumber >= 0 && roomNumber <= amountOfRooms)
 		{
@@ -583,9 +582,9 @@ void PCHandler::changeLog()
 		userPtr->clearScreen();
 		printLog(log);
 		std::cout << std::endl
-			<< "Select the person number you want to change the room of: " << std::endl;
+				  << "Select the person number you want to change the room of: " << std::endl;
 		std::cout << "Press 0 to go back" << std::endl
-			<< std::endl;
+				  << std::endl;
 		std::cin >> personNumber;
 
 		if (personNumber == 0)
@@ -603,7 +602,7 @@ void PCHandler::changeLog()
 		if (validChoice)
 		{
 			std::cout << std::endl
-				<< "Select the room number you want to change to, valid rooms are 1-" << amountOfRooms << ":" << std::endl;
+					  << "Select the room number you want to change to, valid rooms are 1-" << amountOfRooms << ":" << std::endl;
 			std::cin >> roomNumber;
 
 			if (roomNumber == 0)
@@ -630,7 +629,7 @@ void PCHandler::nextMenu()
 {
 	// Waits for the user to press a key before continuing
 	std::cout << std::endl
-		<< "Press any key to continue..." << std::endl;
+			  << "Press any key to continue..." << std::endl;
 	_getch();
 }
 
@@ -642,7 +641,7 @@ std::vector<int> PCHandler::formatLog(bool connect)
 	// If the data is not connected to the arduino, the data is already formatted 256 is max value
 	if (data[0].length() < 4)
 	{
-		for (const std::string& line : data)
+		for (const std::string &line : data)
 		{
 			int value = std::stoi(line);
 			log.push_back(value);
@@ -658,16 +657,16 @@ std::vector<int> PCHandler::formatLog(bool connect)
 
 			// Function to convert example to int array, split on " "
 			std::string delimiter = " "; // Define the delimiter
-			size_t pos = 0;              // Initialize the position variable for finding the delimiter
-			std::string token;           // Initialize a string variable to store the extracted token
+			size_t pos = 0;				 // Initialize the position variable for finding the delimiter
+			std::string token;			 // Initialize a string variable to store the extracted token
 			int i = 0;
 			int arr[10]; // Declare an integer array to store the converted values
 
 			// Loop through the string to extract tokens delimited by a space
 			while ((pos = data[j].find(delimiter)) != std::string::npos)
 			{
-				token = data[j].substr(0, pos);             // Extract the token from the beginning to the delimiter position
-				arr[i] = std::stoi(token);                  // Convert the token to an integer and store it in the array
+				token = data[j].substr(0, pos);				// Extract the token from the beginning to the delimiter position
+				arr[i] = std::stoi(token);					// Convert the token to an integer and store it in the array
 				data[j].erase(0, pos + delimiter.length()); // Remove the extracted token and the delimiter from the string
 				i++;
 			}
@@ -711,7 +710,7 @@ void PCHandler::printSystemInfo()
 	std::cout << "System information: " << std::endl;
 	std::cout << "Amount of rooms: " << amountOfRooms << std::endl;
 	std::cout << "Amount of users: " << amountOfUsers << std::endl
-		<< std::endl;
+			  << std::endl;
 	std::cout << "Current Log from database: " << std::endl;
 	std::vector<int> log = formatLog(false);
 	printLog(log, false);
@@ -731,7 +730,7 @@ void PCHandler::checkIfInitialised()
 		std::cout << "Do you wan to initialise the system?" << std::endl;
 		std::cout << "1. Yes" << std::endl;
 		std::cout << "2. No" << std::endl
-			<< std::endl;
+				  << std::endl;
 		int choice;
 		std::cin >> choice;
 
@@ -758,7 +757,7 @@ void PCHandler::initialiseSystem()
 	//   userPtr->clearScreen();
 
 	std::cout << std::endl
-		<< "Define how many slaves you want to set: " << std::endl;
+			  << "Define how many slaves you want to set: " << std::endl;
 
 	std::cin >> amountOfSlaves;
 
@@ -781,10 +780,10 @@ void PCHandler::selectSaveOnline()
 
 	std::cout << " saved online." << std::endl;
 	std::cout << "Do you want to save the data online?" << std::endl
-		<< std::endl;
+			  << std::endl;
 	std::cout << "1. Yes" << std::endl;
 	std::cout << "2. No" << std::endl
-		<< std::endl;
+			  << std::endl;
 	int choice;
 	std::cin >> choice;
 
@@ -799,4 +798,10 @@ void PCHandler::selectSaveOnline()
 		db->setSaveOnline(false);
 		db->saveData("saveSettings.txt", "false", false);
 	}
+}
+
+void PCHandler::exit()
+{
+	running = false;
+	userPtr->logout();
 }

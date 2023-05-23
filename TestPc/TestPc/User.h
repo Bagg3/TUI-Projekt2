@@ -24,6 +24,8 @@ public:
 	// Function to logout of the system
 	void logout();
 
+	void validate(std::string password);
+
 	// Function to check if the user is logged in
 	bool isLoggedIn();
 
