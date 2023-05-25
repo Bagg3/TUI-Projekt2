@@ -162,7 +162,7 @@ void PCHandler::showChangeOptions()
 		std::cout << "2. Select room connection" << std::endl;
 		std::cout << "3. Calibrate the system" << std::endl;
 		// std::cout << "4. Change name of rooms or persons" << std::endl;
-		std::cout << "4. Select save online" << std::endl;
+		std::cout << "4. Select save options" << std::endl;
 		std::cout << "5. Go Back" << std::endl
 				  << std::endl;
 
