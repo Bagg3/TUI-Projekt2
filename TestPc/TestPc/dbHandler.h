@@ -32,6 +32,6 @@ private:
     bool saveOnline;
 
     std::string laptop = "C:/Users/andre/Documents/GitHub/TUIVSS/TestPc/TestPc/";
-    std::string homePC = "C : / Users / andre / Documents / GitHub / Tui Program / TUIVSS / TestPc / TestPc /";
+    std::string homePC = "C:/Users/andre/Documents/GitHub/Tui Program/TUIVSS/TestPc/TestPc/";
 };
 #endif
