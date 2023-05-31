@@ -20,6 +20,7 @@ public:
     void printData();
 
     std::vector<std::string> getLog(bool connect = true);
+    std::vector<std::string> getLog2();
     std::vector<int> formatLog(bool connect = true);
     void printLog(std::vector<int> log, bool clrScreen = true);
     void printRawData();

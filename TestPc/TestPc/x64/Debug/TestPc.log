@@ -1,4 +1,9 @@
-﻿  PCHandler.cpp
-C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\TestPc\PCHandler.cpp(513,39): warning C4101: 'e': unreferenced local variable
-C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\TestPc\PCHandler.cpp(517,35): warning C4101: 'e': unreferenced local variable
-  TestPc.vcxproj -> C:\Users\andre\Documents\GitHub\TUIVSS\TestPc\x64\Debug\TestPc.exe
+﻿  dbHandler.cpp
+  main.cpp
+  PCHandler.cpp
+C:\Users\andre\Documents\GitHub\Tui Program\TUIVSS\TestPc\TestPc\PCHandler.cpp(511,39): warning C4101: 'e': unreferenced local variable
+C:\Users\andre\Documents\GitHub\Tui Program\TUIVSS\TestPc\TestPc\PCHandler.cpp(515,35): warning C4101: 'e': unreferenced local variable
+  User.cpp
+C:\Users\andre\Documents\GitHub\Tui Program\TUIVSS\TestPc\TestPc\User.cpp(141,65): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
+  TestPc.vcxproj -> C:\Users\andre\Documents\GitHub\Tui Program\TUIVSS\TestPc\x64\Debug\TestPc.exe

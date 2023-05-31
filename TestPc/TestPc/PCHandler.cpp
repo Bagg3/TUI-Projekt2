@@ -37,8 +37,6 @@ void PCHandler::showMenu()
 	running = true; // Used to turn off the program
 	while (running)
 	{
-		int choice = 0;
-
 		// Login function
 		userPtr->login();
 
@@ -47,6 +45,7 @@ void PCHandler::showMenu()
 
 		while (userPtr->isLoggedIn())
 		{
+			int choice = 0;
 			userPtr->clearScreen();
 			// Print the menu
 			std::cout << "Please choose an option:" << std::endl;
@@ -100,12 +99,13 @@ void PCHandler::showMenu()
 
 void PCHandler::printData()
 {
-	int choice = 0;
+	// Declaring variables
 	bool goBack = false;
 	std::vector<int> log;
 
 	while (!goBack)
 	{
+		int choice = 0;
 		userPtr->clearScreen();
 		// The various print options
 		std::cout << "Please choose an option:" << std::endl;
@@ -149,19 +149,17 @@ void PCHandler::printData()
 
 void PCHandler::showChangeOptions()
 {
-
-	int choice = 0;
 	bool goBack = false;
 
 	while (!goBack)
 	{
+		int choice = 0;
 		userPtr->clearScreen();
 		// The various change system options
 		std::cout << "Please choose an option:" << std::endl;
 		std::cout << "1. Add a new slave" << std::endl;
 		std::cout << "2. Select room connection" << std::endl;
 		std::cout << "3. Calibrate the system" << std::endl;
-		// std::cout << "4. Change name of rooms or persons" << std::endl;
 		std::cout << "4. Select save options" << std::endl;
 		std::cout << "5. Go Back" << std::endl
 				  << std::endl;
@@ -333,7 +331,9 @@ std::vector<std::string> PCHandler::getLog(bool connect)
 	return data;
 }
 
-/*
+std::vector<std::string> PCHandler::getLog2()
+{
+	std::vector<std::string> data;
 	std::string string1 = "10 20 40 30 0 0 0 0 0 0";
 	std::string string2 = "20 10 30 20 10 0 0 0 0 0";
 	std::string string3 = "30 0 20 10 10 10 10 0 0 0";
@@ -356,10 +356,9 @@ std::vector<std::string> PCHandler::getLog(bool connect)
 	data.push_back(string9);
 	data.push_back(string10);
 
-
-return data;
+	return data;
 }
-*/
+
 void PCHandler::printLog(std::vector<int> log, bool clrScreen)
 {
 
@@ -635,7 +634,7 @@ void PCHandler::nextMenu()
 
 std::vector<int> PCHandler::formatLog(bool connect)
 {
-	std::vector<std::string> data = getLog(connect);
+	std::vector<std::string> data = getLog2(); /*connect*/
 	std::vector<int> log; // Vector to store the room numbers with highest probability
 
 	// If the data is not connected to the arduino, the data is already formatted 256 is max value

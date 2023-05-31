@@ -61,6 +61,27 @@ void User::login()
 	}
 }
 
+/*
+void User::login()
+{
+	// Checks if the user is logged in, if not, then it will ask for a password
+	while (!isLoggedIn())
+	{
+		clearScreen();
+		std::string password;
+		std::cout << "Login to the system" << std::endl;
+		std::cout << "Password: ";
+		std::cin >> password;
+
+		// Used to bypass the database
+		if (password == "admin")
+		{
+			isLoggedIn_ = true;
+			return;
+		}
+	}
+}
+*/
 void User::logout()
 {
 	isLoggedIn_ = false;
