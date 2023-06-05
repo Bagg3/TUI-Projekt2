@@ -14,7 +14,7 @@ public:
     PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase);
 
     void checkIfInitialised();
-
+    void initialiseOnRestart();
     void showMenu();
 
     void printData();

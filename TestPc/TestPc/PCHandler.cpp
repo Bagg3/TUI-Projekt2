@@ -7,7 +7,7 @@
 
 #define DATA_LENGTH 255
 // const char* portName = "\\\\.\\COM3";
-SerialPort* arduino;
+SerialPort *arduino;
 std::string receivedData;
 /*
 PCHandler::PCHandler(std::string password)
@@ -19,7 +19,7 @@ PCHandler::PCHandler(std::string password)
 }
 */
 
-PCHandler::PCHandler(User* admin, SerialPort* arduino, dbHandler* dataBase)
+PCHandler::PCHandler(User *admin, SerialPort *arduino, dbHandler *dataBase)
 {
 	// Setting up objects and dependcies
 	userPtr = admin;
@@ -56,7 +56,7 @@ void PCHandler::showMenu()
 			std::cout << "5. Change Password" << std::endl;
 			std::cout << "6. Log out" << std::endl;
 			std::cout << "7. Exit" << std::endl
-				<< std::endl;
+					  << std::endl;
 
 			std::cin >> choice;
 
@@ -113,7 +113,7 @@ void PCHandler::printData()
 		std::cout << "2. Print Raw Data" << std::endl;
 		std::cout << "3. Print System Info" << std::endl;
 		std::cout << "4. Go Back" << std::endl
-			<< std::endl;
+				  << std::endl;
 
 		std::cin >> choice;
 
@@ -162,7 +162,7 @@ void PCHandler::showChangeOptions()
 		std::cout << "3. Calibrate the system" << std::endl;
 		std::cout << "4. Select save options" << std::endl;
 		std::cout << "5. Go Back" << std::endl
-			<< std::endl;
+				  << std::endl;
 
 		std::cin >> choice;
 
@@ -225,7 +225,7 @@ void PCHandler::addSlave()
 	while (!validChoice)
 	{
 		std::cout << std::endl
-			<< "Input the room number, valid room are 1-" << amountOfRooms << ":" << std::endl;
+				  << "Input the room number, valid room are 1-" << amountOfRooms << ":" << std::endl;
 		std::cout << "If the slave is between rooms format it as 'X00N', where X and N are the two rooms" << std::endl;
 		std::cout << "If the slave works with an ID-Sensor format it as 'X00X', where X is the room" << std::endl;
 
@@ -431,7 +431,7 @@ void PCHandler::setUsers()
 	db->saveData("users.txt", std::to_string(amountOfUsers), false);
 }
 
-void PCHandler::sendData(const char* sendString)
+void PCHandler::sendData(const char *sendString)
 {
 	// If the arduino is not connected, it will be connected
 	if (!arduino->isConnected())
@@ -495,7 +495,7 @@ void PCHandler::calibrateSystem()
 	nextMenu(); // Next menu function doesnt work on const function
 }
 
-bool PCHandler::isValidRoom(const std::string& input)
+bool PCHandler::isValidRoom(const std::string &input)
 {
 
 	std::stringstream ss(input); // Create a stringstream to extract values separated by commas
@@ -508,11 +508,11 @@ bool PCHandler::isValidRoom(const std::string& input)
 		{
 			roomValue = std::stoi(segment); // Convert the segment to an integer
 		}
-		catch (const std::invalid_argument& e)
+		catch (const std::invalid_argument &e)
 		{
 			return false; // The segment couldn't be converted to an integer
 		}
-		catch (const std::out_of_range& e)
+		catch (const std::out_of_range &e)
 		{
 			return false; // The segment is out of the valid range for an integer
 		}
@@ -536,7 +536,7 @@ void PCHandler::selectRoomConnection()
 	while (!validChoice)
 	{
 		std::cout << std::endl
-			<< "Input the room number 1 to " << amountOfRooms << ": " << std::endl;
+				  << "Input the room number 1 to " << amountOfRooms << ": " << std::endl;
 		std::cin >> roomNumber;
 		if (roomNumber >= 0 && roomNumber <= amountOfRooms)
 		{
@@ -581,9 +581,9 @@ void PCHandler::changeLog()
 		userPtr->clearScreen();
 		printLog(log);
 		std::cout << std::endl
-			<< "Select the person number you want to change the room of: " << std::endl;
+				  << "Select the person number you want to change the room of: " << std::endl;
 		std::cout << "Press 0 to go back" << std::endl
-			<< std::endl;
+				  << std::endl;
 		std::cin >> personNumber;
 
 		if (personNumber == 0)
@@ -601,7 +601,7 @@ void PCHandler::changeLog()
 		if (validChoice)
 		{
 			std::cout << std::endl
-				<< "Select the room number you want to change to, valid rooms are 1-" << amountOfRooms << ":" << std::endl;
+					  << "Select the room number you want to change to, valid rooms are 1-" << amountOfRooms << ":" << std::endl;
 			std::cin >> roomNumber;
 
 			if (roomNumber == 0)
@@ -628,19 +628,19 @@ void PCHandler::nextMenu()
 {
 	// Waits for the user to press a key before continuing
 	std::cout << std::endl
-		<< "Press any key to continue..." << std::endl;
+			  << "Press any key to continue..." << std::endl;
 	_getch();
 }
 
 std::vector<int> PCHandler::formatLog(bool connect)
 {
 	std::vector<std::string> data = getLog2(); /*connect*/
-	std::vector<int> log; // Vector to store the room numbers with highest probability
+	std::vector<int> log;					   // Vector to store the room numbers with highest probability
 
 	// If the data is not connected to the arduino, the data is already formatted 256 is max value
 	if (data[0].length() < 4)
 	{
-		for (const std::string& line : data)
+		for (const std::string &line : data)
 		{
 			int value = std::stoi(line);
 			log.push_back(value);
@@ -709,11 +709,17 @@ void PCHandler::printSystemInfo()
 	std::cout << "System information: " << std::endl;
 	std::cout << "Amount of rooms: " << amountOfRooms << std::endl;
 	std::cout << "Amount of users: " << amountOfUsers << std::endl
-		<< std::endl;
+			  << std::endl;
 	std::cout << "Current Log from database: " << std::endl;
 	std::vector<int> log = formatLog(false);
 	printLog(log, false);
 	nextMenu();
+}
+
+void PCHandler::initialiseOnRestart()
+{
+	std::string data = "E," + std::to_string(amountOfRooms) + "," + std::to_string(amountOfUsers) + "\0";
+	sendData(data.c_str());
 }
 
 void PCHandler::checkIfInitialised()
@@ -723,13 +729,14 @@ void PCHandler::checkIfInitialised()
 	{
 		amountOfRooms = std::stoi(db->findData("rooms.txt", false));
 		amountOfUsers = std::stoi(db->findData("users.txt", false));
+		initialiseOnRestart();
 	}
 	else
 	{
 		std::cout << "Do you wan to initialise the system?" << std::endl;
 		std::cout << "1. Yes" << std::endl;
 		std::cout << "2. No" << std::endl
-			<< std::endl;
+				  << std::endl;
 		int choice;
 		std::cin >> choice;
 
@@ -756,7 +763,7 @@ void PCHandler::initialiseSystem()
 	//   userPtr->clearScreen();
 
 	std::cout << std::endl
-		<< "Define how many slaves you want to set: " << std::endl;
+			  << "Define how many slaves you want to set: " << std::endl;
 
 	std::cin >> amountOfSlaves;
 
@@ -779,10 +786,10 @@ void PCHandler::selectSaveOnline()
 
 	std::cout << " saved online." << std::endl;
 	std::cout << "Do you want to save the data online?" << std::endl
-		<< std::endl;
+			  << std::endl;
 	std::cout << "1. Yes" << std::endl;
 	std::cout << "2. No" << std::endl
-		<< std::endl;
+			  << std::endl;
 	int choice;
 	std::cin >> choice;
 
