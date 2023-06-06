@@ -1,7 +1,8 @@
 #include "dbHandler.h"
-#include <string>
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <stdexcept>
 
 // Constructor with default dbHost - folder name of the database
 dbHandler::dbHandler(std::string dbHost)
@@ -113,11 +114,6 @@ char dbHandler::loadKeyFromFile()
 		throw std::runtime_error("Unable to open file");
 	}
 }
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <stdexcept>
 
 void dbHandler::saveCipheredDataToFile(const std::string &fileAdress, const std::string &data, char key)
 {
